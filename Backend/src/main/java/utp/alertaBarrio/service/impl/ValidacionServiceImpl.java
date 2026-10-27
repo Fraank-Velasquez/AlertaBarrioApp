@@ -44,11 +44,18 @@ public class ValidacionServiceImpl implements ValidacionService {
     @Override
     @Transactional
     public Validacion emitirValidacion(ValidacionRequest request, UUID usuarioId) {
-        Incidente incidente = incidenteDao.findById(request.getIncidenteId())
+        return emitirValidacionConUbicacion(request.getIncidenteId(), request.getTipoVotoId(),
+                request.getNotaActualizacionRapida(), request.getFotoEvidenciaUrl(), null, null, usuarioId);
+    }
+
+    @Transactional
+    public Validacion emitirValidacionConUbicacion(UUID incidenteId, UUID tipoVotoId, String nota,
+                                                   String foto, Double latitud, Double longitud, UUID usuarioId) {
+        Incidente incidente = incidenteDao.findById(incidenteId)
                 .orElseThrow(() -> new RuntimeException("Incidente no encontrado"));
         Usuario usuario = usuarioDao.findById(usuarioId)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-        TipoVoto tipoVoto = tipoVotoDao.findById(request.getTipoVotoId())
+        TipoVoto tipoVoto = tipoVotoDao.findById(tipoVotoId)
                 .orElseThrow(() -> new RuntimeException("Tipo de voto no encontrado"));
 
         if (incidente.getUsuario().getUsuarioId().equals(usuarioId)) {
@@ -59,17 +66,21 @@ public class ValidacionServiceImpl implements ValidacionService {
             throw new RuntimeException("Ya has emitido un voto para este incidente");
         }
 
-        // Geofencing estricto 500m - validación básica
-        // Nota: para validación estricta con coordenadas usuario usar endpoint con ubicación
-        // Aquí permitimos si no se provee validación espacial desde cliente en esta versión básica
+        // Geofencing estricto RN-01: solo dentro de 500m
+        if (latitud != null && longitud != null) {
+            Boolean dentro = incidenteDao.estaDentroDeRadio(incidenteId, longitud, latitud, 500.0);
+            if (Boolean.FALSE.equals(dentro)) {
+                throw new RuntimeException("Debes estar a menos de 500 metros del incidente para validar");
+            }
+        }
 
         Validacion validacion = Validacion.builder()
                 .incidente(incidente)
                 .usuario(usuario)
                 .tipoVoto(tipoVoto)
                 .pesoVotoPonderado(new BigDecimal("1.00"))
-                .notaActualizacionRapida(request.getNotaActualizacionRapida())
-                .fotoEvidenciaUrl(request.getFotoEvidenciaUrl())
+                .notaActualizacionRapida(nota)
+                .fotoEvidenciaUrl(foto)
                 .otorgaPuntosExperiencia(false)
                 .build();
 
@@ -81,7 +92,6 @@ public class ValidacionServiceImpl implements ValidacionService {
             incidente.setConteoVotosNegativos(incidente.getConteoVotosNegativos() == null ? 1 : incidente.getConteoVotosNegativos() + 1);
         }
 
-        // Calcular consenso simple
         int positivos = incidente.getConteoVotosPositivos() == null ? 0 : incidente.getConteoVotosPositivos();
         int negativos = incidente.getConteoVotosNegativos() == null ? 0 : incidente.getConteoVotosNegativos();
         int total = positivos + negativos;

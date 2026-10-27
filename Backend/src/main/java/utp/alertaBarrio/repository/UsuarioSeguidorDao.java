@@ -23,4 +23,8 @@ public interface UsuarioSeguidorDao extends JpaRepository<UsuarioSeguidor, Usuar
             where s.seguidor.usuarioId = :seguidorId and s.seguido.usuarioId = :seguidoId
             """)
     boolean existeSeguimiento(@Param("seguidorId") UUID seguidorId, @Param("seguidoId") UUID seguidoId);
+
+    default boolean esSeguidor(UUID seguidorId, UUID seguidoId) {
+        return existeSeguimiento(seguidorId, seguidoId);
+    }
 }

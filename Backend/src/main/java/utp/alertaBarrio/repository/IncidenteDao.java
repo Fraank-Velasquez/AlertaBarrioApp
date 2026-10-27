@@ -63,6 +63,10 @@ public interface IncidenteDao extends JpaRepository<Incidente, UUID> {
                 @Param("lat") double lat,
                 @Param("radioMetros") double radioMetros);
 
+        @Query(value = "SELECT ST_DWithin(i.ubicacion, ST_SetSRID(ST_MakePoint(:lon, :lat), 4326)::geography, :radioMetros) " +
+                "FROM incidente i WHERE i.incidente_id = :incidenteId", nativeQuery = true)
+        Boolean estaDentroDeRadio(@Param("incidenteId") UUID incidenteId, @Param("lon") double lon, @Param("lat") double lat, @Param("radioMetros") double radioMetros);
+
         @Query(value = "SELECT * FROM incidente i " +
                 "WHERE i.id_estado_incidente IN (:estadosActivos) " +
                 "AND ST_DWithin(i.ubicacion, ST_SetSRID(ST_MakePoint(:lon, :lat), 4326)::geography, :radioMetros) " +
