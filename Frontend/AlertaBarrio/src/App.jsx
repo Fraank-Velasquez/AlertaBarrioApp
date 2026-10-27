@@ -8,6 +8,7 @@ import Feed from './pages/Feed';
 import DetalleIncidente from './pages/DetalleIncidente';
 import DashboardAutoridad from './pages/DashboardAutoridad';
 import Directorio from './pages/Directorio';
+import Onboarding from './pages/Onboarding';
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -16,8 +17,10 @@ const PrivateRoute = ({ children }) => {
 };
 
 function AppRoutes() {
+  const onboardingDone = localStorage.getItem('onboarding') === 'done';
   return (
     <Routes>
+      <Route path="/onboarding" element={<Onboarding />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/mapa" element={<Mapa />} />
@@ -26,7 +29,7 @@ function AppRoutes() {
       <Route path="/incidente/:id" element={<DetalleIncidente />} />
       <Route path="/directorio" element={<Directorio />} />
       <Route path="/admin" element={<DashboardAutoridad />} />
-      <Route path="/" element={<Navigate to="/mapa" />} />
+      <Route path="/" element={<Navigate to={onboardingDone ? '/mapa' : '/onboarding'} />} />
     </Routes>
   );
 }
