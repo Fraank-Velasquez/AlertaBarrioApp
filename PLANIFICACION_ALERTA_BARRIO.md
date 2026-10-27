@@ -6,7 +6,7 @@
 
 | Componente | Estado | Observaciones |
 |---|---|---|
-| **Backend** | Parcialmente iniciado | Spring Boot 4.1.2 con Java 21, PostgreSQL + PostGIS, Hibernate Spatial configurado. Existen todas las entidades JPA mapeadas (Usuario, Rol, Incidente, CategoriaIncidente, EstadoIncidente, TipoVoto, Validacion, Reputacion, PreferenciaUsuario, UsuarioSeguidor, DirectorioEmergencia, IntervencionAutoridad). Todos los DAOs (interfaces JpaRepository) ya están creados. Falta: controllers, services, DTOs, security/JWT, WebSocket, lógica de negocio (consenso, geofencing, anti-duplicidad). |
+| **Backend** | Parcialmente iniciado | Spring Boot 4.1.2 con Java 25 LTS, PostgreSQL + PostGIS, Hibernate Spatial configurado. Existen todas las entidades JPA mapeadas (Usuario, Rol, Incidente, CategoriaIncidente, EstadoIncidente, TipoVoto, Validacion, Reputacion, PreferenciaUsuario, UsuarioSeguidor, DirectorioEmergencia, IntervencionAutoridad). Todos los DAOs (interfaces JpaRepository) ya están creados. Falta: controllers, services, DTOs, security/JWT, WebSocket, lógica de negocio (consenso, geofencing, anti-duplicidad). |
 | **Frontend** | Inicial/Template | Vite + React 19 instalado. Solo tiene `App.jsx` con template por defecto. No hay rutas, componentes, mapa Leaflet, autenticación, etc. |
 | **Base de Datos** | Especificada | Script SQL completo en `integ/CREACION-DB-ALERTABARRIO (1).sql` con todas las tablas, índices GiST, trigger para inicialización 1:1, datos semilla. Diagrama ER disponible. |
 | **Documentación/Planificación** | Completa | Documento técnico detallado con requerimientos, arquitectura, reglas de negocio (motor de consenso, reputación, geofencing, anti-duplicidad), pantallas (P01-P10), matriz RF/RNF, wireframes PNG en `integ/Wireframe Integrador I/`. |
@@ -20,7 +20,7 @@
 - **Reputación gamificada:** +2 pts por validación acertada, peso ponderado según confiabilidad.
 - **Autoridades (`ROLE_AUTHORITY`):** Confirmación inmediata y peso absoluto, pueden cerrar desde dashboard.
 
-**Tecnologías:** Java 21, Spring Boot 4.1.2, Spring Data JPA, Hibernate Spatial, PostgreSQL 15+ PostGIS, JWT (falta agregar), WebSocket/STOMP (falta), React 19 + Vite, Leaflet.js (falta agregar), Tailwind CSS (sugerido).
+**Tecnologías:** Java 25 LTS, Spring Boot 4.1.2, Spring Data JPA, Hibernate Spatial, PostgreSQL 15+ PostGIS, JWT (falta agregar), WebSocket/STOMP (falta), React 19 + Vite, Leaflet.js (falta agregar), Tailwind CSS (sugerido).
 
 ## 2. Recomendación de Orden de Implementación
 
