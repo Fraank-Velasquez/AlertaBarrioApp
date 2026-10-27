@@ -1,11 +1,14 @@
+
 package utp.alertaBarrio.service.impl;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import utp.alertaBarrio.dto.CrearIncidenteRequest;
 import utp.alertaBarrio.dto.IncidenteDTO;
 import utp.alertaBarrio.model.CategoriaIncidente;
@@ -25,6 +28,7 @@ import utp.alertaBarrio.util.GeometryUtil;
 
 @Service
 public class IncidenteServiceImpl implements IncidenteService {
+
     private final IncidenteDao incidenteDao;
     private final UsuarioDao usuarioDao;
     private final CategoriaIncidenteDao categoriaIncidenteDao;
@@ -32,11 +36,14 @@ public class IncidenteServiceImpl implements IncidenteService {
     private final TipoVotoDao tipoVotoDao;
     private final ValidacionDao validacionDao;
 
-    public IncidenteServiceImpl(IncidenteDao incidenteDao, UsuarioDao usuarioDao,
-                                CategoriaIncidenteDao categoriaIncidenteDao,
-                                EstadoIncidenteDao estadoIncidenteDao,
-                                TipoVotoDao tipoVotoDao,
-                                ValidacionDao validacionDao) {
+    public IncidenteServiceImpl(
+            IncidenteDao incidenteDao,
+            UsuarioDao usuarioDao,
+            CategoriaIncidenteDao categoriaIncidenteDao,
+            EstadoIncidenteDao estadoIncidenteDao,
+            TipoVotoDao tipoVotoDao,
+            ValidacionDao validacionDao) {
+
         this.incidenteDao = incidenteDao;
         this.usuarioDao = usuarioDao;
         this.categoriaIncidenteDao = categoriaIncidenteDao;
@@ -45,108 +52,293 @@ public class IncidenteServiceImpl implements IncidenteService {
         this.validacionDao = validacionDao;
     }
 
+    // ==========================================
+    // REGISTRO DE INCIDENTES
+    // ==========================================
+
     @Override
     @Transactional
-    public IncidenteDTO crearIncidente(CrearIncidenteRequest request, UUID usuarioId) {
+    public IncidenteDTO crearIncidente(
+            CrearIncidenteRequest request,
+            UUID usuarioId) {
+
+        // REGLA 1: La descripción es obligatoria
+        if (request == null
+                || request.getDescripcion() == null
+                || request.getDescripcion().isBlank()) {
+
+            throw new IllegalArgumentException(
+                    "La descripción del incidente es obligatoria"
+            );
+        }
+
+        // REGLA 2: Validar coordenadas GPS
+        if (request.getLatitud() == null
+                || request.getLongitud() == null
+                || !Double.isFinite(request.getLatitud())
+                || !Double.isFinite(request.getLongitud())
+                || request.getLatitud() < -90
+                || request.getLatitud() > 90
+                || request.getLongitud() < -180
+                || request.getLongitud() > 180) {
+
+            throw new IllegalArgumentException(
+                    "Las coordenadas GPS no son válidas"
+            );
+        }
+
+        // Buscar al usuario
         Usuario usuario = usuarioDao.findById(usuarioId)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-        CategoriaIncidente categoria = categoriaIncidenteDao.findById(request.getCategoriaId())
-                .orElseThrow(() -> new RuntimeException("Categoría no encontrada"));
-        EstadoIncidente estadoPendiente = estadoIncidenteDao.findByNombre("PENDIENTE")
-                .orElseThrow(() -> new RuntimeException("Estado PENDIENTE no encontrado"));
+                .orElseThrow(() ->
+                        new RuntimeException("Usuario no encontrado")
+                );
 
+        // Buscar la categoría
+        CategoriaIncidente categoria =
+                categoriaIncidenteDao.findById(
+                        request.getCategoriaId()
+                ).orElseThrow(() ->
+                        new RuntimeException("Categoría no encontrada")
+                );
+
+        // Obtener el estado inicial
+        EstadoIncidente estadoPendiente =
+                estadoIncidenteDao.findByNombre("PENDIENTE")
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "Estado PENDIENTE no encontrado"
+                        )
+                );
+
+        // Obtener estados activos
         List<UUID> estadosActivos = new ArrayList<>();
-        estadoIncidenteDao.findByNombre("PENDIENTE").ifPresent(e -> estadosActivos.add(e.getIdEstadoIncidente()));
-        estadoIncidenteDao.findByNombre("CONFIRMADO").ifPresent(e -> estadosActivos.add(e.getIdEstadoIncidente()));
 
-        java.util.Optional<Incidente> duplicado = incidenteDao.buscarDuplicadoCercano(
-                categoria.getIdCategoria(),
-                estadosActivos,
-                request.getLongitud(),
-                request.getLatitud(),
-                50.0);
+        estadoIncidenteDao.findByNombre("PENDIENTE")
+                .ifPresent(e -> estadosActivos.add(
+                        e.getIdEstadoIncidente()
+                ));
+
+        estadoIncidenteDao.findByNombre("CONFIRMADO")
+                .ifPresent(e -> estadosActivos.add(
+                        e.getIdEstadoIncidente()
+                ));
+
+        // Buscar reportes duplicados cercanos
+        java.util.Optional<Incidente> duplicado =
+                incidenteDao.buscarDuplicadoCercano(
+                        categoria.getIdCategoria(),
+                        estadosActivos,
+                        request.getLongitud(),
+                        request.getLatitud(),
+                        50.0
+                );
 
         if (duplicado.isPresent()) {
-            Incidente incidenteExistente = duplicado.get();
-            TipoVoto tipoConfirmar = tipoVotoDao.findByNombre("CONFIRMAR")
-                    .orElseThrow(() -> new RuntimeException("Tipo voto CONFIRMAR no encontrado"));
 
-            if (!validacionDao.existsByIncidenteIncidenteIdAndUsuarioUsuarioId(
-                    incidenteExistente.getIncidenteId(), usuarioId)) {
+            Incidente incidenteExistente = duplicado.get();
+
+            TipoVoto tipoConfirmar =
+                    tipoVotoDao.findByNombre("CONFIRMAR")
+                    .orElseThrow(() ->
+                            new RuntimeException(
+                                    "Tipo voto CONFIRMAR no encontrado"
+                            )
+                    );
+
+            if (!validacionDao
+                    .existsByIncidenteIncidenteIdAndUsuarioUsuarioId(
+                            incidenteExistente.getIncidenteId(),
+                            usuarioId)) {
+
                 Validacion validacion = Validacion.builder()
                         .incidente(incidenteExistente)
                         .usuario(usuario)
                         .tipoVoto(tipoConfirmar)
-                        .pesoVotoPonderado(new BigDecimal("1.00"))
-                        .fotoEvidenciaUrl(request.getFotoEvidenciaUrl())
+                        .pesoVotoPonderado(
+                                new BigDecimal("1.00")
+                        )
+                        .fotoEvidenciaUrl(
+                                request.getFotoEvidenciaUrl()
+                        )
                         .otorgaPuntosExperiencia(false)
                         .build();
+
                 validacionDao.save(validacion);
+
                 incidenteExistente.setConteoVotosPositivos(
-                        incidenteExistente.getConteoVotosPositivos() == null ? 1 : incidenteExistente.getConteoVotosPositivos() + 1);
+                        incidenteExistente.getConteoVotosPositivos() == null
+                                ? 1
+                                : incidenteExistente
+                                        .getConteoVotosPositivos() + 1
+                );
+
                 incidenteDao.save(incidenteExistente);
             }
 
-            throw new RuntimeException("Ya existe un reporte similar en esta ubicación; tu aporte fue sumado como confirmación");
+            throw new RuntimeException(
+                    "Ya existe un reporte similar en esta ubicación; "
+                    + "tu aporte fue sumado como confirmación"
+            );
         }
 
+        // Crear el nuevo incidente
         Incidente incidente = Incidente.builder()
                 .usuario(usuario)
                 .categoria(categoria)
                 .estado(estadoPendiente)
-                .ubicacion(GeometryUtil.createPoint(request.getLongitud(), request.getLatitud()))
+                .ubicacion(
+                        GeometryUtil.createPoint(
+                                request.getLongitud(),
+                                request.getLatitud()
+                        )
+                )
                 .descripcion(request.getDescripcion())
-                .fotoEvidenciaUrl(request.getFotoEvidenciaUrl())
-                .indiceConfianzaPorcentaje(new BigDecimal("0.00"))
+                .fotoEvidenciaUrl(
+                        request.getFotoEvidenciaUrl()
+                )
+                .indiceConfianzaPorcentaje(
+                        new BigDecimal("0.00")
+                )
                 .conteoVotosPositivos(0)
                 .conteoVotosNegativos(0)
                 .build();
 
         Incidente saved = incidenteDao.save(incidente);
+
         return mapToDTO(saved);
     }
 
-    @Override
-    public List<IncidenteDTO> listarPorRadio(double latitud, double longitud, double radioMetros) {
-        List<UUID> estadosActivos = new ArrayList<>();
-        estadoIncidenteDao.findByNombre("PENDIENTE").ifPresent(e -> estadosActivos.add(e.getIdEstadoIncidente()));
-        estadoIncidenteDao.findByNombre("EN_REVISION").ifPresent(e -> estadosActivos.add(e.getIdEstadoIncidente()));
-        estadoIncidenteDao.findByNombre("CONFIRMADO").ifPresent(e -> estadosActivos.add(e.getIdEstadoIncidente()));
+    // ==========================================
+    // LISTAR INCIDENTES POR RADIO
+    // ==========================================
 
-        List<Incidente> incidentes = incidenteDao.listarPorRadio(estadosActivos, longitud, latitud, radioMetros);
+    @Override
+    public List<IncidenteDTO> listarPorRadio(
+            double latitud,
+            double longitud,
+            double radioMetros) {
+
+        List<UUID> estadosActivos = new ArrayList<>();
+
+        estadoIncidenteDao.findByNombre("PENDIENTE")
+                .ifPresent(e -> estadosActivos.add(
+                        e.getIdEstadoIncidente()
+                ));
+
+        estadoIncidenteDao.findByNombre("EN_REVISION")
+                .ifPresent(e -> estadosActivos.add(
+                        e.getIdEstadoIncidente()
+                ));
+
+        estadoIncidenteDao.findByNombre("CONFIRMADO")
+                .ifPresent(e -> estadosActivos.add(
+                        e.getIdEstadoIncidente()
+                ));
+
+        List<Incidente> incidentes =
+                incidenteDao.listarPorRadio(
+                        estadosActivos,
+                        longitud,
+                        latitud,
+                        radioMetros
+                );
+
         List<IncidenteDTO> result = new ArrayList<>();
+
         for (Incidente i : incidentes) {
             result.add(mapToDTO(i));
         }
+
         return result;
     }
 
+    // ==========================================
+    // OBTENER INCIDENTE POR ID
+    // ==========================================
+
     @Override
     public IncidenteDTO obtenerPorId(UUID incidenteId) {
+
         Incidente incidente = incidenteDao.findById(incidenteId)
-                .orElseThrow(() -> new RuntimeException("Incidente no encontrado"));
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "Incidente no encontrado"
+                        )
+                );
+
         return mapToDTO(incidente);
     }
 
+    // ==========================================
+    // CONVERTIR ENTIDAD A DTO
+    // ==========================================
+
     private IncidenteDTO mapToDTO(Incidente i) {
+
         IncidenteDTO dto = new IncidenteDTO();
+
         dto.setIncidenteId(i.getIncidenteId());
-        dto.setUsuarioId(i.getUsuario().getUsuarioId());
-        dto.setAutorNombre(i.getUsuario().getNombres() + " " + i.getUsuario().getApellidos());
-        dto.setCategoriaId(i.getCategoria().getIdCategoria());
-        dto.setCategoriaNombre(i.getCategoria().getNombre());
-        dto.setEstadoId(i.getEstado().getIdEstadoIncidente());
-        dto.setEstadoNombre(i.getEstado().getNombre());
+
+        dto.setUsuarioId(
+                i.getUsuario().getUsuarioId()
+        );
+
+        dto.setAutorNombre(
+                i.getUsuario().getNombres()
+                        + " "
+                        + i.getUsuario().getApellidos()
+        );
+
+        dto.setCategoriaId(
+                i.getCategoria().getIdCategoria()
+        );
+
+        dto.setCategoriaNombre(
+                i.getCategoria().getNombre()
+        );
+
+        dto.setEstadoId(
+                i.getEstado().getIdEstadoIncidente()
+        );
+
+        dto.setEstadoNombre(
+                i.getEstado().getNombre()
+        );
+
         if (i.getUbicacion() != null) {
-            dto.setLongitud(i.getUbicacion().getX());
-            dto.setLatitud(i.getUbicacion().getY());
+            dto.setLongitud(
+                    i.getUbicacion().getX()
+            );
+
+            dto.setLatitud(
+                    i.getUbicacion().getY()
+            );
         }
-        dto.setDescripcion(i.getDescripcion());
-        dto.setFotoEvidenciaUrl(i.getFotoEvidenciaUrl());
-        dto.setFechaHoraReporte(i.getFechaHoraReporte());
-        dto.setIndiceConfianzaPorcentaje(i.getIndiceConfianzaPorcentaje());
-        dto.setConteoVotosPositivos(i.getConteoVotosPositivos());
-        dto.setConteoVotosNegativos(i.getConteoVotosNegativos());
+
+        dto.setDescripcion(
+                i.getDescripcion()
+        );
+
+        dto.setFotoEvidenciaUrl(
+                i.getFotoEvidenciaUrl()
+        );
+
+        dto.setFechaHoraReporte(
+                i.getFechaHoraReporte()
+        );
+
+        dto.setIndiceConfianzaPorcentaje(
+                i.getIndiceConfianzaPorcentaje()
+        );
+
+        dto.setConteoVotosPositivos(
+                i.getConteoVotosPositivos()
+        );
+
+        dto.setConteoVotosNegativos(
+                i.getConteoVotosNegativos()
+        );
+
         return dto;
     }
 }
