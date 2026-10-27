@@ -16,8 +16,8 @@ const Login = () => {
     try {
       await login(correo, contrasena);
       navigate('/');
-    } catch {
-      setError('Credenciales inválidas');
+    } catch (err) {
+      setError(err.response?.data?.mensaje || 'Credenciales inválidas');
     }
   };
 

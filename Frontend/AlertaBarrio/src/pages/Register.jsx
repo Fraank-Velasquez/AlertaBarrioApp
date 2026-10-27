@@ -17,8 +17,8 @@ const Register = () => {
     try {
       await register(form);
       navigate('/');
-    } catch {
-      setError('Error al registrar');
+    } catch (err) {
+      setError(err.response?.data?.mensaje || 'No se pudo crear la cuenta. Verifica que el servidor esté disponible.');
     }
   };
 
