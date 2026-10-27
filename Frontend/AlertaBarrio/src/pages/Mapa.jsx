@@ -74,12 +74,12 @@ const Mapa = () => {
                 <strong>{inc.categoriaNombre}</strong>
                 <p>{inc.estadoNombre}</p>
                 <p>Confianza: {inc.indiceConfianzaPorcentaje}%</p>
+                <Link to={`/incidente/${inc.incidenteId}`} className="text-blue-600">Ver detalle</Link>
               </div>
             </Popup>
           </Marker>
         ))}
       </MapContainer>
-
       <div className="pointer-events-none absolute inset-x-0 top-0 z-[500] bg-gradient-to-b from-white/95 to-white/80 px-4 py-2 shadow-sm backdrop-blur">
         <p className="text-sm font-bold text-slate-800">⌖ &nbsp;Piura, Perú</p>
         <p className="mt-0.5 text-xs text-slate-500">Alertas comunitarias cercanas</p>
@@ -107,7 +107,6 @@ const Mapa = () => {
             </Link>
           </div>
         </section>
-      )}
     </div>
   );
 };

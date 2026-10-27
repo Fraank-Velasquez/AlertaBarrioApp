@@ -11,6 +11,7 @@ import Directorio from './pages/Directorio';
 import Inicio from './pages/Inicio';
 import Perfil from './pages/Perfil';
 import AppLayout from './components/AppLayout';
+import Onboarding from './pages/Onboarding';
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -21,6 +22,7 @@ const PrivateRoute = ({ children }) => {
 function AppRoutes() {
   return (
     <Routes>
+      <Route path="/onboarding" element={<Onboarding />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route element={<AppLayout />}>
