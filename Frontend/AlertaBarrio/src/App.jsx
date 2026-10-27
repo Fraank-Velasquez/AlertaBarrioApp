@@ -8,6 +8,9 @@ import Feed from './pages/Feed';
 import DetalleIncidente from './pages/DetalleIncidente';
 import DashboardAutoridad from './pages/DashboardAutoridad';
 import Directorio from './pages/Directorio';
+import Inicio from './pages/Inicio';
+import Perfil from './pages/Perfil';
+import AppLayout from './components/AppLayout';
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -20,13 +23,17 @@ function AppRoutes() {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
-      <Route path="/mapa" element={<Mapa />} />
-      <Route path="/reportar" element={<PrivateRoute><Reportar /></PrivateRoute>} />
-      <Route path="/feed" element={<Feed />} />
-      <Route path="/incidente/:id" element={<DetalleIncidente />} />
-      <Route path="/directorio" element={<Directorio />} />
-      <Route path="/admin" element={<DashboardAutoridad />} />
-      <Route path="/" element={<Navigate to="/mapa" />} />
+      <Route element={<AppLayout />}>
+        <Route path="/" element={<Inicio />} />
+        <Route path="/mapa" element={<Mapa />} />
+        <Route path="/reportar" element={<PrivateRoute><Reportar /></PrivateRoute>} />
+        <Route path="/feed" element={<Feed />} />
+        <Route path="/incidente/:id" element={<DetalleIncidente />} />
+        <Route path="/directorio" element={<Directorio />} />
+        <Route path="/admin" element={<DashboardAutoridad />} />
+        <Route path="/perfil" element={<PrivateRoute><Perfil /></PrivateRoute>} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Route>
     </Routes>
   );
 }

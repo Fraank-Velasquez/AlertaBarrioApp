@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Register = () => {
   const { register } = useAuth();
   const navigate = useNavigate();
   const [form, setForm] = useState({ nombres: '', apellidos: '', correo: '', contrasena: '', sectorResidencia: '' });
   const [error, setError] = useState('');
+  const [mostrarContrasena, setMostrarContrasena] = useState(false);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -15,24 +16,68 @@ const Register = () => {
     setError('');
     try {
       await register(form);
-      navigate('/mapa');
-    } catch (err) {
+      navigate('/');
+    } catch {
       setError('Error al registrar');
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <form onSubmit={handleSubmit} className="w-full max-w-sm bg-white p-6 rounded shadow">
-        <h1 className="text-xl font-bold mb-4">Registro - AlertaBarrio</h1>
-        {error && <p className="text-red-600 text-sm mb-2">{error}</p>}
-        <input className="w-full border p-2 mb-2" name="nombres" placeholder="Nombres" onChange={handleChange} />
-        <input className="w-full border p-2 mb-2" name="apellidos" placeholder="Apellidos" onChange={handleChange} />
-        <input className="w-full border p-2 mb-2" name="correo" placeholder="Correo" onChange={handleChange} />
-        <input className="w-full border p-2 mb-2" name="contrasena" type="password" placeholder="Contraseña" onChange={handleChange} />
-        <input className="w-full border p-2 mb-4" name="sectorResidencia" placeholder="Sector de residencia" onChange={handleChange} />
-        <button className="w-full bg-green-600 text-white p-2 rounded">Registrarse</button>
-      </form>
+    <div className="min-h-[100dvh] bg-[#f5f7fa]">
+      <header className="grid h-14 grid-cols-[1fr_auto_1fr] items-center bg-blue-700 px-4 text-white shadow-sm">
+        <button type="button" onClick={() => navigate('/login')} aria-label="Volver a iniciar sesión" className="justify-self-start p-2 text-2xl leading-none">‹</button>
+        <h1 className="text-base font-bold">Registro de Vecino</h1>
+        <span className="justify-self-end p-2" aria-hidden="true"> </span>
+      </header>
+
+      <div className="mx-auto max-w-md px-4 pb-8 pt-6 sm:pt-10">
+        <div className="text-center">
+          <h2 className="text-2xl font-extrabold tracking-tight text-slate-900">Únete a la red de tu Barrio</h2>
+          <p className="mt-2 text-base leading-6 text-slate-600">Crea tu cuenta para reportar incidentes, validar alertas y proteger tu sector.</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="mt-6 space-y-3">
+          {error && <p role="alert" className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700">{error}</p>}
+
+          <label className="block text-xs font-bold text-slate-700">
+            Nombres
+            <input className="mt-1 h-12 w-full rounded-lg border border-slate-300 bg-white px-3 text-base font-normal text-slate-900 outline-none placeholder:text-slate-400 focus:border-blue-600" name="nombres" autoComplete="given-name" placeholder="Ej. Carlos" value={form.nombres} onChange={handleChange} required />
+          </label>
+
+          <label className="block text-xs font-bold text-slate-700">
+            Apellidos
+            <input className="mt-1 h-12 w-full rounded-lg border border-slate-300 bg-white px-3 text-base font-normal text-slate-900 outline-none placeholder:text-slate-400 focus:border-blue-600" name="apellidos" autoComplete="family-name" placeholder="Ej. Mendoza" value={form.apellidos} onChange={handleChange} required />
+          </label>
+
+          <label className="block text-xs font-bold text-slate-700">
+            Correo Electrónico
+            <input className="mt-1 h-12 w-full rounded-lg border border-slate-300 bg-white px-3 text-base font-normal text-slate-900 outline-none placeholder:text-slate-400 focus:border-blue-600" name="correo" type="email" autoComplete="email" placeholder="tu.correo@ejemplo.com" value={form.correo} onChange={handleChange} required />
+          </label>
+
+          <label className="block text-xs font-bold text-slate-700">
+            Sector o Barrio de Residencia
+            <input className="mt-1 h-12 w-full rounded-lg border border-slate-300 bg-white px-3 text-base font-normal text-slate-900 outline-none placeholder:text-slate-400 focus:border-blue-600" name="sectorResidencia" autoComplete="address-level3" placeholder="Castilla / La Primavera" value={form.sectorResidencia} onChange={handleChange} required />
+          </label>
+
+          <label className="block text-xs font-bold text-slate-700">
+            Contraseña
+            <span className="mt-1 flex h-12 items-center rounded-lg border border-slate-300 bg-white px-3 focus-within:border-blue-600">
+              <input className="min-w-0 flex-1 bg-transparent text-base font-normal text-slate-900 outline-none placeholder:text-slate-400" name="contrasena" type={mostrarContrasena ? 'text' : 'password'} autoComplete="new-password" placeholder="Mínimo 8 caracteres" minLength={8} value={form.contrasena} onChange={handleChange} required />
+              <button type="button" onClick={() => setMostrarContrasena((mostrar) => !mostrar)} aria-label={mostrarContrasena ? 'Ocultar contraseña' : 'Mostrar contraseña'} className="px-1 text-lg text-slate-500">
+                {mostrarContrasena ? '◉' : '◎'}
+              </button>
+            </span>
+          </label>
+
+          <button type="submit" className="w-full rounded-lg bg-blue-700 py-3.5 text-xs font-extrabold uppercase tracking-wide text-white shadow-sm transition hover:bg-blue-800">
+            Crear Cuenta
+          </button>
+        </form>
+
+        <p className="mt-10 text-center text-sm text-slate-600">
+          ¿Ya tienes una cuenta? <Link to="/login" className="font-semibold text-blue-700 hover:underline">Inicia Sesión aquí</Link>
+        </p>
+      </div>
     </div>
   );
 };
