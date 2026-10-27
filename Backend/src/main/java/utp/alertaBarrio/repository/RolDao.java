@@ -13,4 +13,8 @@ public interface RolDao extends JpaRepository<Rol, UUID> {
 
     @Query("select r from Rol r where lower(r.nombreRol) = lower(:nombreRol)")
     Optional<Rol> buscarPorNombre(@Param("nombreRol") String nombreRol);
+
+    default Optional<Rol> findByNombreRol(String nombreRol) {
+        return buscarPorNombre(nombreRol);
+    }
 }

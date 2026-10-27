@@ -17,4 +17,8 @@ public interface CategoriaIncidenteDao extends JpaRepository<CategoriaIncidente,
 
     @Query("select c from CategoriaIncidente c where lower(c.nombre) = lower(:nombre)")
     Optional<CategoriaIncidente> buscarPorNombre(@Param("nombre") String nombre);
+
+    default Optional<CategoriaIncidente> findByNombre(String nombre) {
+        return buscarPorNombre(nombre);
+    }
 }

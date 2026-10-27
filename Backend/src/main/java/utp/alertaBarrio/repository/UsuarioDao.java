@@ -14,6 +14,10 @@ public interface UsuarioDao extends JpaRepository<Usuario, UUID> {
     @Query("select u from Usuario u join fetch u.rol where lower(u.correo) = lower(:correo)")
     Optional<Usuario> buscarPorCorreo(@Param("correo") String correo);
 
+    default Optional<Usuario> findByCorreo(String correo) {
+        return buscarPorCorreo(correo);
+    }
+
     @Query("select u from Usuario u where u.activo = true and u.usuarioId = :usuarioId")
     Optional<Usuario> buscarActivoPorId(@Param("usuarioId") UUID usuarioId);
 }

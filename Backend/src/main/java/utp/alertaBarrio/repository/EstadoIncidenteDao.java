@@ -17,4 +17,8 @@ public interface EstadoIncidenteDao extends JpaRepository<EstadoIncidente, UUID>
 
     @Query("select e from EstadoIncidente e where lower(e.nombre) = lower(:nombre)")
     Optional<EstadoIncidente> buscarPorNombre(@Param("nombre") String nombre);
+
+    default Optional<EstadoIncidente> findByNombre(String nombre) {
+        return buscarPorNombre(nombre);
+    }
 }

@@ -17,4 +17,8 @@ public interface TipoVotoDao extends JpaRepository<TipoVoto, UUID> {
 
     @Query("select t from TipoVoto t where lower(t.nombre) = lower(:nombre)")
     Optional<TipoVoto> buscarPorNombre(@Param("nombre") String nombre);
+
+    default Optional<TipoVoto> findByNombre(String nombre) {
+        return buscarPorNombre(nombre);
+    }
 }

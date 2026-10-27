@@ -33,4 +33,13 @@ public interface ValidacionDao extends JpaRepository<Validacion, UUID> {
     boolean existeValidacion(
             @Param("incidenteId") UUID incidenteId,
             @Param("usuarioId") UUID usuarioId);
+
+    boolean existsByIncidenteIncidenteIdAndUsuarioUsuarioId(UUID incidenteId, UUID usuarioId);
+    List<Validacion> findByIncidenteIncidenteId(UUID incidenteId);
+    long countByIncidenteIncidenteId(UUID incidenteId);
+    java.util.Optional<Validacion> findByIncidenteIncidenteIdAndUsuarioUsuarioId(UUID incidenteId, UUID usuarioId);
+
+    default boolean yaVoto(UUID incidenteId, UUID usuarioId) {
+        return existeValidacion(incidenteId, usuarioId);
+    }
 }
