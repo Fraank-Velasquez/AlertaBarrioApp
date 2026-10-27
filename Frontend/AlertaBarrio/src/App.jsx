@@ -3,6 +3,9 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Mapa from './pages/Mapa';
+import Reportar from './pages/Reportar';
+import Feed from './pages/Feed';
+import DetalleIncidente from './pages/DetalleIncidente';
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -15,7 +18,10 @@ function AppRoutes() {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
-      <Route path="/mapa" element={<PrivateRoute><Mapa /></PrivateRoute>} />
+      <Route path="/mapa" element={<Mapa />} />
+      <Route path="/reportar" element={<PrivateRoute><Reportar /></PrivateRoute>} />
+      <Route path="/feed" element={<Feed />} />
+      <Route path="/incidente/:id" element={<DetalleIncidente />} />
       <Route path="/" element={<Navigate to="/mapa" />} />
     </Routes>
   );
