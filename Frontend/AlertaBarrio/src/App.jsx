@@ -6,6 +6,8 @@ import Mapa from './pages/Mapa';
 import Reportar from './pages/Reportar';
 import Feed from './pages/Feed';
 import DetalleIncidente from './pages/DetalleIncidente';
+import DashboardAutoridad from './pages/DashboardAutoridad';
+import Directorio from './pages/Directorio';
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -22,6 +24,8 @@ function AppRoutes() {
       <Route path="/reportar" element={<PrivateRoute><Reportar /></PrivateRoute>} />
       <Route path="/feed" element={<Feed />} />
       <Route path="/incidente/:id" element={<DetalleIncidente />} />
+      <Route path="/directorio" element={<Directorio />} />
+      <Route path="/admin" element={<DashboardAutoridad />} />
       <Route path="/" element={<Navigate to="/mapa" />} />
     </Routes>
   );
