@@ -1,6 +1,7 @@
 package utp.alertaBarrio.config;
 
 import java.util.List;
+import org.springframework.http.HttpMethod;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -36,6 +37,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**", "/api/public/**", "/ws/**", "/ws", "/topic/**", "/app/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/incidentes", "/api/incidentes/**").permitAll()
                 .requestMatchers("/api/admin/**").hasRole("AUTORIDAD")
                 .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

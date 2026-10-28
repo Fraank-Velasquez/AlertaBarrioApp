@@ -34,6 +34,11 @@ public interface IncidenteDao extends JpaRepository<Incidente, UUID> {
                         """)
         List<Incidente> listarPorUsuario(@Param("usuarioId") UUID usuarioId);
 
+        @Query(value = "SELECT * FROM incidente i " +
+                "WHERE i.id_estado_incidente IN (:estadosActivos) " +
+                "ORDER BY i.fecha_hora_reporte DESC", nativeQuery = true)
+        List<Incidente> listarTodosActivos(@Param("estadosActivos") List<UUID> estadosActivos);
+
         @Query(value = """
                         select *
                         from incidente
@@ -53,7 +58,7 @@ public interface IncidenteDao extends JpaRepository<Incidente, UUID> {
                 "WHERE i.id_categoria = :categoriaId " +
                 "AND i.id_estado_incidente IN (:estadosActivos) " +
                 "AND i.fecha_hora_reporte >= NOW() - INTERVAL '2 hours' " +
-                "AND ST_DWithin(i.ubicacion, ST_SetSRID(ST_MakePoint(:lon, :lat), 4326)::geography, :radioMetros) " +
+                "AND ST_DWithin(i.ubicacion::geography, ST_SetSRID(ST_MakePoint(:lon, :lat), 4326)::geography, :radioMetros) " +
                 "ORDER BY i.fecha_hora_reporte DESC " +
                 "LIMIT 1", nativeQuery = true)
         java.util.Optional<Incidente> buscarDuplicadoCercano(
@@ -63,13 +68,13 @@ public interface IncidenteDao extends JpaRepository<Incidente, UUID> {
                 @Param("lat") double lat,
                 @Param("radioMetros") double radioMetros);
 
-        @Query(value = "SELECT ST_DWithin(i.ubicacion, ST_SetSRID(ST_MakePoint(:lon, :lat), 4326)::geography, :radioMetros) " +
+        @Query(value = "SELECT ST_DWithin(i.ubicacion::geography, ST_SetSRID(ST_MakePoint(:lon, :lat), 4326)::geography, :radioMetros) " +
                 "FROM incidente i WHERE i.incidente_id = :incidenteId", nativeQuery = true)
         Boolean estaDentroDeRadio(@Param("incidenteId") UUID incidenteId, @Param("lon") double lon, @Param("lat") double lat, @Param("radioMetros") double radioMetros);
 
         @Query(value = "SELECT * FROM incidente i " +
                 "WHERE i.id_estado_incidente IN (:estadosActivos) " +
-                "AND ST_DWithin(i.ubicacion, ST_SetSRID(ST_MakePoint(:lon, :lat), 4326)::geography, :radioMetros) " +
+                "AND ST_DWithin(i.ubicacion::geography, ST_SetSRID(ST_MakePoint(:lon, :lat), 4326)::geography, :radioMetros) " +
                 "ORDER BY i.fecha_hora_reporte DESC", nativeQuery = true)
         List<Incidente> listarPorRadio(
                 @Param("estadosActivos") List<UUID> estadosActivos,

@@ -20,6 +20,8 @@ public class IncidenteDTO {
     private BigDecimal indiceConfianzaPorcentaje;
     private Integer conteoVotosPositivos;
     private Integer conteoVotosNegativos;
+    private boolean duplicado;
+    private String mensaje;
 
     public UUID getIncidenteId() {
         return incidenteId;
@@ -139,5 +141,21 @@ public class IncidenteDTO {
 
     public void setConteoVotosNegativos(Integer conteoVotosNegativos) {
         this.conteoVotosNegativos = conteoVotosNegativos;
+    }
+
+    public boolean isDuplicado() {
+        return duplicado;
+    }
+
+    public void setDuplicado(boolean duplicado) {
+        this.duplicado = duplicado;
+    }
+
+    public String getMensaje() {
+        return mensaje;
+    }
+
+    public void setMensaje(String mensaje) {
+        this.mensaje = mensaje;
     }
 }

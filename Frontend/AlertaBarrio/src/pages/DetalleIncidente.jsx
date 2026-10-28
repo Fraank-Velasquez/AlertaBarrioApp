@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { resolveMediaUrl } from '../utils/media';
 
 const DetalleIncidente = () => {
   const { id } = useParams();
@@ -72,6 +73,9 @@ const DetalleIncidente = () => {
 
         <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
           <h2 className="text-base font-extrabold text-slate-900">Descripción</h2>
+          {incidente.fotoEvidenciaUrl && (
+            <img src={resolveMediaUrl(incidente.fotoEvidenciaUrl)} alt="Evidencia del incidente" className="mt-3 max-h-72 w-full rounded-lg object-cover" />
+          )}
           <p className="mt-3 whitespace-pre-line text-sm leading-6 text-slate-600">
             {incidente.descripcion || 'El vecino no agregó detalles adicionales.'}
           </p>

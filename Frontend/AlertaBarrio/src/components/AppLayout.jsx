@@ -75,6 +75,7 @@ const AppLayout = () => {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const menuOpen = menuState.path === location.pathname && menuState.open;
   const isMap = location.pathname === '/mapa';
+  const isReport = location.pathname === '/reportar';
 
   const cerrarMenu = () => setMenuState({ path: location.pathname, open: false });
 
@@ -168,19 +169,19 @@ const AppLayout = () => {
           <div className="grid h-14 grid-cols-[1fr_auto_1fr] items-center bg-blue-700 px-4 text-white sm:hidden">
             <button
               type="button"
-              aria-label={menuOpen ? 'Cerrar menú' : 'Abrir menú'}
-              aria-expanded={menuOpen}
-              onClick={() => setMenuState({ path: location.pathname, open: !menuOpen })}
+              aria-label={isReport ? 'Volver' : (menuOpen ? 'Cerrar menú' : 'Abrir menú')}
+              aria-expanded={isReport ? undefined : menuOpen}
+              onClick={isReport ? () => navigate(-1) : () => setMenuState({ path: location.pathname, open: !menuOpen })}
               className="justify-self-start rounded-full p-2 text-xl leading-none hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
             >
-              {menuOpen ? '×' : '☰'}
+              {isReport ? '←' : (menuOpen ? '×' : '☰')}
             </button>
             <NavLink to="/" onClick={cerrarMenu} className="text-base font-bold tracking-tight" aria-label="AlertaBarrio, inicio">
               AlertaBarrio
             </NavLink>
             <div className="flex justify-self-end">
               <NavLink to="/feed" onClick={cerrarMenu} aria-label="Ver alertas" className="rounded-full p-2 hover:bg-white/10"><BellIcon /></NavLink>
-              <NavLink to={user ? '/perfil' : '/login'} onClick={cerrarMenu} aria-label={user ? 'Mi cuenta' : 'Iniciar sesión'} className="rounded-full p-2 hover:bg-white/10"><PersonIcon /></NavLink>
+              {!isReport && <NavLink to={user ? '/perfil' : '/login'} onClick={cerrarMenu} aria-label={user ? 'Mi cuenta' : 'Iniciar sesión'} className="rounded-full p-2 hover:bg-white/10"><PersonIcon /></NavLink>}
             </div>
           </div>
 
@@ -201,11 +202,11 @@ const AppLayout = () => {
         </header>
       )}
 
-      <main className={`min-h-0 flex-1 ${isMap ? 'overflow-hidden' : 'pb-20 sm:pb-0'}`}>
+      <main className={`min-h-0 flex-1 ${isMap ? 'overflow-hidden' : isReport ? 'pb-0 sm:pb-0' : 'pb-20 sm:pb-0'}`}>
         <Outlet />
       </main>
 
-      <nav aria-label="Navegación móvil inferior" className="mobile-bottom-nav fixed inset-x-0 bottom-0 z-[1000] grid grid-cols-5 items-center border-t border-[#E4E6EB] bg-white px-2 shadow-[0_-2px_12px_rgba(0,0,0,0.05)] sm:hidden">
+      {!isReport && <nav aria-label="Navegación móvil inferior" className="mobile-bottom-nav fixed inset-x-0 bottom-0 z-[1000] grid grid-cols-5 items-center border-t border-[#E4E6EB] bg-white px-2 shadow-[0_-2px_12px_rgba(0,0,0,0.05)] sm:hidden">
         <NavLink to="/feed" className={({ isActive }) => `mobile-tab ${isActive ? 'mobile-tab-active' : ''}`}>
           <RssIcon /><span>Feed</span>
         </NavLink>
@@ -231,7 +232,7 @@ const AppLayout = () => {
         <NavLink to={user ? '/perfil' : '/login'} className={({ isActive }) => `mobile-tab ${isActive ? 'mobile-tab-active' : ''}`}>
           <UserRoundIcon /><span>Profile</span>
         </NavLink>
-      </nav>
+      </nav>}
 
       <AuthRequiredModal open={authModalOpen} onClose={() => setAuthModalOpen(false)} />
     </div>

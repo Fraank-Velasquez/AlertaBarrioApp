@@ -71,8 +71,9 @@ public class IncidenteServiceImpl implements IncidenteService {
             TipoVoto tipoConfirmar = tipoVotoDao.findByNombre("CONFIRMAR")
                     .orElseThrow(() -> new RuntimeException("Tipo voto CONFIRMAR no encontrado"));
 
-            if (!validacionDao.existsByIncidenteIncidenteIdAndUsuarioUsuarioId(
-                    incidenteExistente.getIncidenteId(), usuarioId)) {
+            boolean yaExistiaValidacion = validacionDao.existsByIncidenteIncidenteIdAndUsuarioUsuarioId(
+                    incidenteExistente.getIncidenteId(), usuarioId);
+            if (!yaExistiaValidacion) {
                 Validacion validacion = Validacion.builder()
                         .incidente(incidenteExistente)
                         .usuario(usuario)
@@ -87,7 +88,12 @@ public class IncidenteServiceImpl implements IncidenteService {
                 incidenteDao.save(incidenteExistente);
             }
 
-            throw new RuntimeException("Ya existe un reporte similar en esta ubicación; tu aporte fue sumado como confirmación");
+            IncidenteDTO resultado = mapToDTO(incidenteExistente);
+            resultado.setDuplicado(true);
+            resultado.setMensaje(yaExistiaValidacion
+                    ? "Ya habías confirmado un reporte similar en esta ubicación."
+                    : "Ya existe un reporte similar; tu aporte fue sumado como confirmación.");
+            return resultado;
         }
 
         Incidente incidente = Incidente.builder()
@@ -103,17 +109,39 @@ public class IncidenteServiceImpl implements IncidenteService {
                 .build();
 
         Incidente saved = incidenteDao.save(incidente);
-        return mapToDTO(saved);
+        IncidenteDTO resultado = mapToDTO(saved);
+        resultado.setMensaje("Incidente registrado correctamente.");
+        return resultado;
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<IncidenteDTO> listarPorRadio(double latitud, double longitud, double radioMetros) {
+        List<UUID> estadosActivos = estadosActivos();
+
+        List<Incidente> incidentes = incidenteDao.listarPorRadio(estadosActivos, longitud, latitud, radioMetros);
+        return mapearIncidentes(incidentes);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<IncidenteDTO> listarTodosActivos() {
+        List<Incidente> incidentes = incidenteDao.listarTodosActivos(estadosActivos());
+        return mapearIncidentes(incidentes);
+    }
+
+    private List<UUID> estadosActivos() {
         List<UUID> estadosActivos = new ArrayList<>();
         estadoIncidenteDao.findByNombre("PENDIENTE").ifPresent(e -> estadosActivos.add(e.getIdEstadoIncidente()));
         estadoIncidenteDao.findByNombre("EN_REVISION").ifPresent(e -> estadosActivos.add(e.getIdEstadoIncidente()));
         estadoIncidenteDao.findByNombre("CONFIRMADO").ifPresent(e -> estadosActivos.add(e.getIdEstadoIncidente()));
+        if (estadosActivos.isEmpty()) {
+            throw new IllegalStateException("No hay estados activos configurados para mostrar incidentes");
+        }
+        return estadosActivos;
+    }
 
-        List<Incidente> incidentes = incidenteDao.listarPorRadio(estadosActivos, longitud, latitud, radioMetros);
+    private List<IncidenteDTO> mapearIncidentes(List<Incidente> incidentes) {
         List<IncidenteDTO> result = new ArrayList<>();
         for (Incidente i : incidentes) {
             result.add(mapToDTO(i));
@@ -122,6 +150,7 @@ public class IncidenteServiceImpl implements IncidenteService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public IncidenteDTO obtenerPorId(UUID incidenteId) {
         Incidente incidente = incidenteDao.findById(incidenteId)
                 .orElseThrow(() -> new RuntimeException("Incidente no encontrado"));
@@ -147,6 +176,7 @@ public class IncidenteServiceImpl implements IncidenteService {
         dto.setIndiceConfianzaPorcentaje(i.getIndiceConfianzaPorcentaje());
         dto.setConteoVotosPositivos(i.getConteoVotosPositivos());
         dto.setConteoVotosNegativos(i.getConteoVotosNegativos());
+        dto.setDuplicado(false);
         return dto;
     }
 }
