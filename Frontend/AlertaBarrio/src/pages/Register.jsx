@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
+import { DISTRITOS_PIURA } from '../constants/distritosPiura';
 
 const Register = () => {
   const { register } = useAuth();
@@ -55,8 +56,11 @@ const Register = () => {
           </label>
 
           <label className="block text-xs font-bold text-slate-700">
-            Sector o Barrio de Residencia
-            <input className="mt-1 h-12 w-full rounded-lg border border-slate-300 bg-white px-3 text-base font-normal text-slate-900 outline-none placeholder:text-slate-400 focus:border-blue-600" name="sectorResidencia" autoComplete="address-level3" placeholder="Castilla / La Primavera" value={form.sectorResidencia} onChange={handleChange} required />
+            Distrito de residencia
+            <select className="mt-1 h-12 w-full rounded-lg border border-slate-300 bg-white px-3 text-base font-normal text-slate-900 outline-none focus:border-blue-600" name="sectorResidencia" autoComplete="address-level3" value={form.sectorResidencia} onChange={handleChange} required>
+              <option value="" disabled>Indique su distrito de residencia</option>
+              {DISTRITOS_PIURA.map((distrito) => <option key={distrito} value={distrito}>{distrito}</option>)}
+            </select>
           </label>
 
           <label className="block text-xs font-bold text-slate-700">

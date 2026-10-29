@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import api from '../services/api';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { resolveMediaUrl } from '../utils/media';
+import PerfilUsuarioModal from '../components/PerfilUsuarioModal';
 
 const distanciaMetros = (lat1, lon1, lat2, lon2) => {
   const radioTierra = 6371000;
@@ -49,6 +50,7 @@ const Feed = () => {
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState('');
   const [toast, setToast] = useState('');
+  const [usuarioSeleccionado, setUsuarioSeleccionado] = useState(null);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -201,42 +203,60 @@ const Feed = () => {
               : null;
 
             return (
-              <Link to={`/incidente/${inc.incidenteId}`} key={inc.incidenteId} className={`block overflow-hidden rounded-2xl border-l-4 ${colorCategoria(inc.categoriaNombre)} bg-white p-4 shadow-[0_3px_14px_rgba(15,23,42,0.07)] transition hover:shadow-md`}>
+              <article key={inc.incidenteId} className={`overflow-hidden rounded-2xl border-l-4 ${colorCategoria(inc.categoriaNombre)} bg-white p-4 shadow-[0_3px_14px_rgba(15,23,42,0.07)] transition hover:shadow-md`}>
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex min-w-0 items-center gap-3">
                     <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-slate-100 text-xs font-extrabold text-blue-800">{iniciales}</span>
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-bold text-slate-900">{inc.autorNombre || 'Vecino de la zona'}</p>
+                      <button type="button" onClick={() => inc.usuarioId && setUsuarioSeleccionado({ id: inc.usuarioId, nombre: inc.autorNombre })} className="block max-w-full truncate text-left text-sm font-bold text-slate-900 hover:text-blue-700">
+                        {inc.autorNombre || 'Vecino de la zona'}
+                      </button>
                       <p className="text-xs text-slate-500">{inc.categoriaNombre || 'Incidente reportado'}</p>
                     </div>
                   </div>
-                  <span className="shrink-0 rounded-full bg-blue-50 px-3 py-1.5 text-xs font-bold text-blue-700">Ver detalle</span>
+                  <button type="button" onClick={() => navigate(`/incidente/${inc.incidenteId}`)} className="shrink-0 rounded-full bg-blue-50 px-3 py-1.5 text-xs font-bold text-blue-700 hover:bg-blue-100">Ver detalle</button>
                 </div>
 
                 <div className="mt-3 flex flex-wrap gap-2">
                   <span className={`rounded-md px-2 py-1 text-[10px] font-bold uppercase tracking-wide ${confirmado ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-800'}`}>
                     {inc.estadoNombre || 'En revisión'}
                   </span>
-                  {confianza > 0 && <span className="rounded-md bg-blue-50 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-blue-700">{confianza}% confianza</span>}
                 </div>
 
                 <p className="mt-3 text-xs font-semibold text-slate-500">
                   {distancia !== null ? `A ${distancia} m` : 'Distancia no disponible'} · {tiempoTranscurrido(inc.fechaHoraReporte)}
                 </p>
-                <h2 className="mt-1 text-lg font-bold leading-snug text-slate-900">{inc.descripcion || inc.categoriaNombre || 'Incidente reportado'}</h2>
-                {inc.fotoEvidenciaUrl && <img src={resolveMediaUrl(inc.fotoEvidenciaUrl)} alt="Evidencia del incidente" className="mt-3 max-h-56 w-full rounded-lg object-cover" />}
-
+                <p className="mt-2 text-sm leading-6 text-slate-700">
+                  {inc.descripcion || 'El vecino no agregó detalles adicionales.'}
+                </p>
+                {inc.fotoEvidenciaUrl && (
+                  <img
+                    src={resolveMediaUrl(inc.fotoEvidenciaUrl)}
+                    alt={`Evidencia de ${inc.categoriaNombre || 'incidente'}`}
+                    className="mt-3 max-h-56 w-full rounded-lg object-cover"
+                  />
+                )}
                 <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-200" aria-label={`${confianza}% de confianza`}>
-                  <div className={`h-full rounded-full ${confirmado ? 'bg-emerald-500' : 'bg-amber-400'}`} style={{ width: `${confianza}%` }} />
+                  <div
+                    className={`h-full rounded-full ${confirmado ? 'bg-emerald-500' : 'bg-amber-400'}`}
+                    style={{ width: `${confianza}%` }}
+                  />
                 </div>
                 <p className="mt-2 text-xs font-semibold text-slate-500">
                   {inc.conteoVotosPositivos || 0} confirmaron · {inc.conteoVotosNegativos || 0} rechazaron
                 </p>
-              </Link>
+              </article>
             );
           })}
         </div>
       </div>
+      {usuarioSeleccionado && (
+        <PerfilUsuarioModal
+          usuarioId={usuarioSeleccionado.id}
+          nombreInicial={usuarioSeleccionado.nombre}
+          onClose={() => setUsuarioSeleccionado(null)}
+        />
+      )}
     </div>
   );
 };

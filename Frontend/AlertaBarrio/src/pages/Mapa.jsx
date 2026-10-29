@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import api from '../services/api';
+import { useAuth } from '../context/AuthContext';
 
 const PIURA = [-5.19449, -80.63282];
 
@@ -43,10 +44,13 @@ const Recenter = ({ position }) => {
 
 const Mapa = () => {
   const navigate = useNavigate();
+  const { isAuthenticated, user } = useAuth();
   const [position, setPosition] = useState(PIURA);
   const [incidentes, setIncidentes] = useState([]);
+  const [distrito, setDistrito] = useState('Piura');
 
   useEffect(() => {
+    let activo = true;
     const cargarIncidentes = async () => {
       try {
         const res = await api.get('/incidentes');
@@ -56,6 +60,21 @@ const Mapa = () => {
       }
     };
 
+    const cargarDistrito = async () => {
+      if (!isAuthenticated) {
+        setDistrito('Piura');
+        return;
+      }
+
+      try {
+        const respuesta = await api.get('/perfil');
+        if (activo) setDistrito(respuesta.data.sectorResidencia || user?.sectorResidencia || 'Piura');
+      } catch {
+        if (activo) setDistrito(user?.sectorResidencia || 'Piura');
+      }
+    };
+
+    cargarDistrito();
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const coords = [pos.coords.latitude, pos.coords.longitude];
@@ -65,7 +84,11 @@ const Mapa = () => {
       () => cargarIncidentes(),
       { timeout: 5000 }
     );
-  }, []);
+
+    return () => {
+      activo = false;
+    };
+  }, [isAuthenticated, user?.sectorResidencia]);
 
   return (
     <div className="mx-auto flex h-full w-full max-w-[600px] flex-col bg-white">
@@ -75,7 +98,7 @@ const Mapa = () => {
             <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
             <circle cx="12" cy="10" r="3" />
           </svg>
-          <span>Castilla, Piura</span>
+          <span>{distrito}, Piura</span>
         </div>
         <span className="text-xs font-semibold text-[#454B5A]">Incidentes registrados</span>
       </div>
