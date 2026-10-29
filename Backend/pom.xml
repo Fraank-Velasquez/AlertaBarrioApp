@@ -15,6 +15,7 @@
 	<description/>
 	<properties>
 		<java.version>23</java.version>
+		<maven.compiler.release>23</maven.compiler.release>
 	</properties>
 	<dependencies>
 		<dependency>
