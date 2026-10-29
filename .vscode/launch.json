@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-AlertaBarrioApplication<alertaBarrio>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "utp.alertaBarrio.AlertaBarrioApplication",
+            "projectName": "alertaBarrio",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}

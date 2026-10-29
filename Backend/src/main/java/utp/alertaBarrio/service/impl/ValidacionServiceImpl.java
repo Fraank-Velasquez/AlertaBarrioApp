@@ -86,7 +86,7 @@ public class ValidacionServiceImpl implements ValidacionService {
 
         Validacion saved = validacionDao.save(validacion);
 
-        if ("CONFIRMAR".equalsIgnoreCase(tipoVoto.getNombre())) {
+        if (esVotoConfirmacion(tipoVoto.getNombre())) {
             incidente.setConteoVotosPositivos(incidente.getConteoVotosPositivos() == null ? 1 : incidente.getConteoVotosPositivos() + 1);
         } else {
             incidente.setConteoVotosNegativos(incidente.getConteoVotosNegativos() == null ? 1 : incidente.getConteoVotosNegativos() + 1);
@@ -105,5 +105,10 @@ public class ValidacionServiceImpl implements ValidacionService {
 
         incidenteDao.save(incidente);
         return saved;
+    }
+
+    private boolean esVotoConfirmacion(String nombreTipoVoto) {
+        return "CONFIRMAR".equalsIgnoreCase(nombreTipoVoto)
+                || "CONFIRMADO".equalsIgnoreCase(nombreTipoVoto);
     }
 }

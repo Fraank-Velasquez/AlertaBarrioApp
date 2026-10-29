@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import utp.alertaBarrio.dto.ValidacionConUbicacionRequest;
 import utp.alertaBarrio.dto.ValidacionRequest;
-import utp.alertaBarrio.model.Validacion;
 import utp.alertaBarrio.security.CustomUserDetails;
 import utp.alertaBarrio.service.ValidacionService;
 import utp.alertaBarrio.service.impl.ValidacionServiceImpl;
@@ -23,18 +22,18 @@ public class ValidacionController {
     }
 
     @PostMapping
-    public ResponseEntity<Validacion> emitir(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                             @RequestBody ValidacionRequest request) {
-        Validacion validacion = validacionService.emitirValidacion(request, userDetails.getUsuarioId());
-        return ResponseEntity.ok(validacion);
+    public ResponseEntity<Void> emitir(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                       @RequestBody ValidacionRequest request) {
+        validacionService.emitirValidacion(request, userDetails.getUsuarioId());
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/con-ubicacion")
-    public ResponseEntity<Validacion> emitirConUbicacion(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                                         @RequestBody ValidacionConUbicacionRequest request) {
-        Validacion validacion = ((ValidacionServiceImpl) validacionService).emitirValidacionConUbicacion(
+    public ResponseEntity<Void> emitirConUbicacion(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                   @RequestBody ValidacionConUbicacionRequest request) {
+        ((ValidacionServiceImpl) validacionService).emitirValidacionConUbicacion(
                 request.getIncidenteId(), request.getTipoVotoId(), request.getNotaActualizacionRapida(),
                 request.getFotoEvidenciaUrl(), request.getLatitud(), request.getLongitud(), userDetails.getUsuarioId());
-        return ResponseEntity.ok(validacion);
+        return ResponseEntity.ok().build();
     }
 }

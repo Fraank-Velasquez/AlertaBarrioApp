@@ -3,6 +3,7 @@ package utp.alertaBarrio.service.impl;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,16 +69,14 @@ public class IncidenteServiceImpl implements IncidenteService {
 
         if (duplicado.isPresent()) {
             Incidente incidenteExistente = duplicado.get();
-            TipoVoto tipoConfirmar = tipoVotoDao.findByNombre("CONFIRMAR")
-                    .orElseThrow(() -> new RuntimeException("Tipo voto CONFIRMAR no encontrado"));
-
             boolean yaExistiaValidacion = validacionDao.existsByIncidenteIncidenteIdAndUsuarioUsuarioId(
                     incidenteExistente.getIncidenteId(), usuarioId);
-            if (!yaExistiaValidacion) {
+            Optional<TipoVoto> tipoConfirmar = buscarTipoConfirmacion();
+            if (!yaExistiaValidacion && tipoConfirmar.isPresent()) {
                 Validacion validacion = Validacion.builder()
                         .incidente(incidenteExistente)
                         .usuario(usuario)
-                        .tipoVoto(tipoConfirmar)
+                        .tipoVoto(tipoConfirmar.get())
                         .pesoVotoPonderado(new BigDecimal("1.00"))
                         .fotoEvidenciaUrl(request.getFotoEvidenciaUrl())
                         .otorgaPuntosExperiencia(false)
@@ -92,7 +91,9 @@ public class IncidenteServiceImpl implements IncidenteService {
             resultado.setDuplicado(true);
             resultado.setMensaje(yaExistiaValidacion
                     ? "Ya habías confirmado un reporte similar en esta ubicación."
-                    : "Ya existe un reporte similar; tu aporte fue sumado como confirmación.");
+                    : tipoConfirmar.isEmpty()
+                            ? "Ya existe un reporte similar en esta ubicación."
+                            : "Ya existe un reporte similar; tu aporte fue sumado como confirmación.");
             return resultado;
         }
 
@@ -112,6 +113,11 @@ public class IncidenteServiceImpl implements IncidenteService {
         IncidenteDTO resultado = mapToDTO(saved);
         resultado.setMensaje("Incidente registrado correctamente.");
         return resultado;
+    }
+
+    private Optional<TipoVoto> buscarTipoConfirmacion() {
+        return tipoVotoDao.findByNombre("CONFIRMAR")
+                .or(() -> tipoVotoDao.findByNombre("CONFIRMADO"));
     }
 
     @Override
