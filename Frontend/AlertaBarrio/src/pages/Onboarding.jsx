@@ -38,27 +38,32 @@ const Onboarding = () => {
             className="w-full aspect-video rounded-xl overflow-hidden"
             style={{ aspectRatio: '16/9', borderRadius: '12px', background: 'linear-gradient(135deg, #c9dcff 0%, #e7f0ff 100%)' }}
           >
-            <svg viewBox="0 0 640 360" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+            <svg viewBox="0 0 640 360" className="w-full h-full" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Vecinos usando AlertaBarrio">
               <defs>
                 <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#dbe8ff" />
-                  <stop offset="100%" stopColor="#f1f6ff" />
+                  <stop offset="0%" stopColor="#cce9f8" />
+                  <stop offset="100%" stopColor="#f5fbff" />
+                </linearGradient>
+                <linearGradient id="phone" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stopColor="#173d69" />
+                  <stop offset="100%" stopColor="#0d2b4e" />
                 </linearGradient>
               </defs>
               <rect width="640" height="360" fill="url(#bg)" />
-              <g stroke="#9bb7ff" strokeWidth="6" opacity="0.4">
-                <line x1="0" y1="280" x2="640" y2="280" />
+              <path d="M0 292h640v68H0z" fill="#f3f5ef" />
+              <path d="M0 286h640" stroke="#c6d6d5" strokeWidth="4" />
+
+              <g transform="translate(235 62)">
+                <rect width="170" height="246" rx="22" fill="url(#phone)" />
+                <rect x="10" y="23" width="150" height="196" rx="12" fill="#f8fcff" />
+                <circle cx="85" cy="11" r="4" fill="#7fa0bd" />
+                <path d="M20 53l44-20 33 31 40-20 23 25v116H20z" fill="#d5e9f1" />
+                <path d="M23 127l37-28 35 19 39-39 36 36" fill="none" stroke="#7ab3c1" strokeWidth="6" />
+                <path d="M55 118c0-15 12-27 27-27s27 12 27 27c0 20-27 45-27 45s-27-25-27-45z" fill="#0756c9" />
+                <circle cx="82" cy="118" r="9" fill="#fff" />
+                <rect x="38" y="188" width="94" height="10" rx="5" fill="#d4e5ef" />
+                <rect x="55" y="230" width="60" height="7" rx="3.5" fill="#7fa0bd" />
               </g>
-              <circle cx="160" cy="240" r="14" fill="#1d4ed8" opacity="0.9" />
-              <circle cx="320" cy="220" r="16" fill="#dc2626" opacity="0.95" />
-              <circle cx="460" cy="250" r="12" fill="#059669" opacity="0.9" />
-              <rect x="90" y="150" width="120" height="90" rx="14" fill="#ffffff" opacity="0.9" />
-              <rect x="110" y="170" width="80" height="10" rx="5" fill="#cbd5f5" />
-              <rect x="110" y="190" width="60" height="10" rx="5" fill="#e2e8f0" />
-              <rect x="110" y="210" width="70" height="10" rx="5" fill="#e2e8f0" />
-              <circle cx="520" cy="150" r="34" fill="#ffffff" stroke="#dbeafe" strokeWidth="8" />
-              <path d="M520 126v12m0 24v12m-24-24h12m24 0h12" stroke="#2563eb" strokeWidth="6" strokeLinecap="round" />
-              <path d="M508 138l24 24m-24 0l24-24" stroke="#2563eb" strokeWidth="6" strokeLinecap="round" />
             </svg>
           </div>
         </section>
@@ -87,18 +92,14 @@ const Onboarding = () => {
           }}
         >
           <div
-            className="w-16 h-16 rounded-full flex items-center justify-center mb-4 relative"
+            className="grid h-16 w-16 place-items-center rounded-full mb-4 relative"
             style={{ backgroundColor: '#D3E4FE' }}
           >
-            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 8.5C10.62 8.5 9.5 9.62 9.5 11C9.5 12.38 10.62 13.5 12 13.5C13.38 13.5 14.5 12.38 14.5 11C14.5 9.62 13.38 8.5 12 8.5ZM12 21C10.73 21 9.54 20.75 8.47 20.29C7.4 19.83 6.45 19.19 5.64 18.36C4.81 17.55 4.17 16.6 3.71 15.53C3.25 14.46 3 13.27 3 12C3 7.86 6.5 4.43 10.96 4.01C11.64 3.93 12.36 3.93 13.04 4.01C17.5 4.43 21 7.86 21 12C21 13.27 20.75 14.46 20.29 15.53C19.83 16.6 19.19 17.55 18.36 18.36C17.55 19.19 16.6 19.83 15.53 20.29C14.46 20.75 13.27 21 12 21ZM12 6C11.3 6 10.62 6.07 9.97 6.2C6.61 6.88 4 9.17 4 12C4 16.42 7.58 20 12 20C16.42 20 20 16.42 20 12C20 9.17 17.39 6.88 14.03 6.2C13.38 6.07 12.7 6 12 6Z" fill="#004BC7" />
-              <circle cx="12" cy="11" r="2.5" fill="#004BC7" />
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M12 21s7-6.1 7-12A7 7 0 0 0 5 9c0 5.9 7 12 7 12Z" fill="#004BC7" />
+              <circle cx="12" cy="9" r="2.5" fill="#D3E4FE" />
             </svg>
-            <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center" style={{ backgroundColor: '#004BC7' }}>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22C12 22 19 14.25 19 9C19 5.13 15.87 2 12 2ZM12 11.5C10.62 11.5 9.5 10.38 9.5 9C9.5 7.62 10.62 6.5 12 6.5C13.38 6.5 14.5 7.62 14.5 9C14.5 10.38 13.38 11.5 12 11.5Z" fill="white" />
-              </svg>
-            </span>
+
           </div>
 
           <p className="text-[15px] leading-[22px] font-medium text-[#2A3B53] mb-5 px-2">

@@ -171,7 +171,7 @@ const AppLayout = () => {
               type="button"
               aria-label={isReport ? 'Volver' : (menuOpen ? 'Cerrar menú' : 'Abrir menú')}
               aria-expanded={isReport ? undefined : menuOpen}
-              onClick={isReport ? () => navigate(-1) : () => setMenuState({ path: location.pathname, open: !menuOpen })}
+              onClick={isReport ? () => navigate('/mapa') : () => setMenuState({ path: location.pathname, open: !menuOpen })}
               className="justify-self-start rounded-full p-2 text-xl leading-none hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
             >
               {isReport ? '←' : (menuOpen ? '×' : '☰')}

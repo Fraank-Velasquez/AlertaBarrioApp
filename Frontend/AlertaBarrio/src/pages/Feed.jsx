@@ -149,15 +149,8 @@ const Feed = () => {
               <h1 className="text-xl font-extrabold tracking-tight text-blue-700">AlertaBarrio</h1>
               <p className="mt-0.5 text-xs font-semibold text-slate-600">
                 {ubicacion || (lat === null ? 'Ubicación no disponible' : 'Detectando ubicación…')}
-                <span aria-hidden="true">⌄</span>
               </p>
             </div>
-            <span className="grid h-10 w-10 place-items-center rounded-full bg-white text-xl text-blue-700 shadow-sm" aria-hidden="true">
-              <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" />
-                <path d="M10 21h4" />
-              </svg>
-            </span>
           </div>
           <div className="mt-4 flex gap-2 overflow-x-auto pb-1">
             {filtros.map((filtro) => (

@@ -31,7 +31,12 @@ const Login = () => {
 
       <div className="mx-auto max-w-md px-4 pb-8 pt-6 sm:pt-12">
         <div className="text-center">
-          <span className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-blue-100 text-3xl text-blue-700" aria-hidden="true">♙</span>
+          <span className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-blue-100 text-blue-700" aria-hidden="true">
+            <svg viewBox="0 0 24 24" className="h-9 w-9" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+              <circle cx="12" cy="8" r="3.5" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 20a7 7 0 0 1 14 0" />
+            </svg>
+          </span>
           <h2 className="mt-4 text-2xl font-extrabold tracking-tight text-slate-900">Bienvenido de nuevo</h2>
           <p className="mt-2 text-base leading-6 text-slate-600">Ingresa tus credenciales para acceder a tus alertas y reputación vecinal.</p>
         </div>

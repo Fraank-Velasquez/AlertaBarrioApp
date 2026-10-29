@@ -225,7 +225,6 @@ const Perfil = () => {
 
         <section className="rounded-2xl bg-white p-4 shadow-[0_3px_14px_rgba(15,23,42,0.07)]">
           <h2 className="text-xs font-extrabold uppercase tracking-wide text-slate-600">Ajustes de red</h2>
-          <label className="block border-b border-slate-100 py-4 text-sm text-slate-800">Radio de cobertura: <strong>{preferencias.radioCoberturaGeografica} m</strong><input type="range" min="100" max="10000" step="100" value={preferencias.radioCoberturaGeografica} onChange={(event) => guardarPreferencias({ ...preferencias, radioCoberturaGeografica: Number(event.target.value) })} className="mt-3 w-full accent-blue-700" /></label>
           <label className="flex items-center justify-between border-b border-slate-100 py-4 text-base text-slate-800">Notificaciones de alertas<input type="checkbox" checked={preferencias.recibirAlertasGlobales} onChange={(event) => guardarPreferencias({ ...preferencias, recibirAlertasGlobales: event.target.checked })} className="h-5 w-10 accent-blue-700" /></label>
           <label className="flex items-center justify-between py-4 text-base text-slate-800">Avisos de vecinos que sigo<input type="checkbox" checked={preferencias.recibirAlertasVecinos} onChange={(event) => guardarPreferencias({ ...preferencias, recibirAlertasVecinos: event.target.checked })} className="h-5 w-10 accent-blue-700" /></label>
         </section>
