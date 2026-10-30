@@ -1,13 +1,44 @@
 import { useState } from 'react';
+import { Icon } from '@iconify/react';
 
 const Directorio = () => {
   const [distrito, setDistrito] = useState('Castilla');
   const contactos = [
-    { id: 1, entidad: 'Bomberos Piura', numero: '116', distrito: 'Piura', detalle: 'Compañía de Bomberos', color: 'bg-red-600', border: 'border-red-600', icon: '♨' },
-    { id: 2, entidad: 'Policía Nacional', numero: '105', distrito: 'Piura', detalle: 'Central de Emergencias PNP', color: 'bg-slate-600', border: 'border-slate-600', icon: '⬟' },
-    { id: 3, entidad: 'Serenazgo Piura', numero: '073-331-000', distrito: 'Piura', detalle: 'Unidad de Patrullaje Local', color: 'bg-amber-500', border: 'border-amber-500', icon: '✦' },
-    { id: 4, entidad: 'SAMU', numero: '106', distrito: 'Piura', detalle: 'Ambulancias y Emergencias Médicas', color: 'bg-blue-700', border: 'border-blue-700', icon: '✚' },
-    { id: 5, entidad: 'Serenazgo Castilla', numero: '073-345-000', distrito: 'Castilla', detalle: 'Unidad de Patrullaje Local', color: 'bg-amber-500', border: 'border-amber-500', icon: '✦' },
+    {
+      id: 1, entidad: 'Bomberos Piura', numero: '116', distrito: 'Piura', detalle: 'Compañía de Bomberos', color: 'bg-red-600', border: 'border-red-600',
+      icon: <Icon icon="mdi:fire-hydrant"
+        width="30"
+        height="30"
+        color='#ffffff' />
+    },
+    {
+      id: 2, entidad: 'Policía Nacional', numero: '105', distrito: 'Piura', detalle: 'Central de Emergencias PNP', color: 'bg-slate-600', border: 'border-slate-600',
+      icon: <Icon icon="material-symbols:local-police-outline"
+        width="30"
+        height="30"
+        color='#ffffff' />
+    },
+    {
+      id: 3, entidad: 'Serenazgo Piura', numero: '073-331-000', distrito: 'Piura', detalle: 'Unidad de Patrullaje Local', color: 'bg-amber-500', border: 'border-amber-500',
+      icon: <Icon icon="material-symbols:detection-and-zone"
+        width="30"
+        height="30"
+        color='#ffffff' />
+    },
+    {
+      id: 4, entidad: 'SAMU', numero: '106', distrito: 'Piura', detalle: 'Ambulancias y Emergencias Médicas', color: 'bg-blue-700', border: 'border-blue-700',
+      icon: <Icon icon="ic:baseline-local-hospital"
+        width="30"
+        height="30"
+        color='#ffffff' />
+    },
+    {
+      id: 5, entidad: 'Serenazgo Castilla', numero: '073-345-000', distrito: 'Castilla', detalle: 'Unidad de Patrullaje Local', color: 'bg-amber-500', border: 'border-amber-500',
+      icon: <Icon icon="material-symbols:camera-outdoor"
+        width="30"
+        height="30"
+        color='#ffffff' />
+    },
   ];
   const filtrados = contactos.filter((contacto) => contacto.distrito === distrito);
 
@@ -15,7 +46,12 @@ const Directorio = () => {
     <div className="min-h-full bg-[#f5f7fa] px-4 pb-8 pt-6">
       <div className="mx-auto max-w-lg">
         <div className="mb-5 flex items-start gap-3">
-          <span className="mt-1 grid h-10 w-10 shrink-0 place-items-center rounded-full bg-red-50 text-2xl font-black text-red-600" aria-hidden="true">✱</span>
+          <span className="mt-1 grid h-13 w-13 shrink-0 place-items-center rounded-full bg-red-50 text-2xl font-black text-red-600" aria-hidden="true">
+            <Icon icon="streamline-cyber:contact-list-1"
+              width="25"
+              height="25"
+              color='#2d2e30' />
+          </span>
           <div>
             <h1 className="text-2xl font-extrabold leading-tight text-slate-900">Directorio de Emergencia</h1>
             <p className="mt-2 text-base leading-6 text-slate-600">Líneas directas y respuesta rápida - Castilla / Piura</p>
@@ -29,11 +65,10 @@ const Directorio = () => {
               key={option}
               onClick={() => setDistrito(option)}
               aria-pressed={distrito === option}
-              className={`shrink-0 rounded-full border px-4 py-2 text-xs font-bold transition ${
-                distrito === option ? 'border-blue-700 bg-blue-700 text-white' : 'border-slate-300 bg-white text-slate-700'
-              }`}
+              className={`shrink-0 rounded-full border px-4 py-2 text-xs font-bold transition ${distrito === option ? 'border-blue-700 bg-blue-700 text-white' : 'border-slate-300 bg-white text-slate-700'
+                }`}
             >
-              {distrito === option && <span aria-hidden="true">⌖ </span>}{option}
+              {distrito === option}{option}
             </button>
           ))}
         </div>
@@ -51,7 +86,10 @@ const Directorio = () => {
                 </div>
               </div>
               <span className={`mt-4 flex min-h-12 items-center justify-center gap-2 rounded-full ${contacto.color} px-4 text-sm font-extrabold text-white`}>
-                <span aria-hidden="true">☎</span>{contacto.numero}
+                <Icon icon="zondicons:phone"
+                  width="23"
+                  height="23"
+                  color='#ffffff' />{contacto.numero}
               </span>
             </a>
           ))}

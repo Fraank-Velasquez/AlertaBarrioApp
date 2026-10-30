@@ -5,6 +5,7 @@ import api from '../services/api';
 import { resolveMediaUrl } from '../utils/media';
 import PerfilUsuarioModal from '../components/PerfilUsuarioModal';
 import { DISTRITOS_PIURA } from '../constants/distritosPiura';
+import { Icon } from '@iconify/react';
 
 const emptyPreferences = {
   radioCoberturaGeografica: 1000,
@@ -144,7 +145,10 @@ const Perfil = () => {
           {!editando ? (
             <>
               <h1 className="mt-3 text-lg font-bold text-slate-900">{nombre}</h1>
-              <p className="mt-1 text-sm text-slate-600">⌖ {perfil.sectorResidencia || 'Zona no registrada'}</p>
+              <p className="mt-1 text-sm text-slate-600 flex justify-center items-center gap-1"><Icon icon="material-symbols:distance-outline"
+                width="23"
+                height="23"
+                color='#1D4ED8' /> {perfil.sectorResidencia || 'Zona no registrada'}</p>
               <p className="mt-1 text-xs text-slate-500">{perfil.correo} · Miembro desde {formatDate(perfil.fechaRegistro)}</p>
               <div className="mt-3 flex justify-center gap-4 text-sm font-bold text-slate-700">
                 <span>{perfil.seguidores} Seguidores</span><span aria-hidden="true">•</span><span>{perfil.siguiendo} Siguiendo</span>
@@ -178,7 +182,11 @@ const Perfil = () => {
         </section>
 
         <section className="rounded-2xl border-l-4 border-blue-700 bg-white p-4 shadow-[0_3px_14px_rgba(15,23,42,0.07)]">
-          <div className="flex items-start justify-between gap-3"><div><p className="text-xl font-extrabold text-slate-900">Nivel {perfil.nivelReputacion ?? '—'}</p><p className="text-sm text-slate-600">Confiabilidad comunitaria</p></div><span className="text-2xl text-blue-700" aria-hidden="true">⬟</span></div>
+          <div className="flex items-start justify-between gap-3"><div><p className="text-xl font-extrabold text-slate-900">Nivel {perfil.nivelReputacion ?? '—'}</p><p className="text-sm text-slate-600">Confiabilidad comunitaria</p></div><span className="text-2xl text-blue-700" aria-hidden="true">
+            <Icon icon="mdi:medal"
+              width="28"
+              height="28"
+              color='#1D4ED8' /></span></div>
           <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-200"><div className="h-full rounded-full bg-blue-700" style={{ width: `${confianza}%` }} /></div>
           <div className="mt-2 flex justify-between text-xs text-slate-500"><span>{confianza}% de confiabilidad</span><span>{perfil.experienciaPts ?? 0} pts de experiencia</span></div>
           <p className="mt-1 text-xs text-slate-500">Acierto en validaciones: {perfil.porcentajeAcierto ?? 0}%</p>

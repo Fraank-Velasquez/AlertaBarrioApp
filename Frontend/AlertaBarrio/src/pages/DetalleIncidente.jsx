@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { resolveMediaUrl } from '../utils/media';
+import { Icon } from '@iconify/react';
 
 const DetalleIncidente = () => {
   const { id } = useParams();
@@ -49,12 +50,15 @@ const DetalleIncidente = () => {
     <div className="min-h-full bg-[#f5f7fa] px-4 py-5">
       <div className="mx-auto max-w-lg space-y-4">
         <section className="flex items-center gap-3 rounded-2xl border border-red-300 bg-red-50 p-4 text-red-800">
-          <span className="text-3xl" aria-hidden="true">⚠</span>
+          <Icon icon="carbon:event-incident"
+            width="35"
+            height="30"
+            color='#a10707' />
           <div className="min-w-0 flex-1">
             <p className="text-lg font-extrabold uppercase leading-tight">Incidente reportado</p>
-            <h1 className="mt-1 text-sm font-semibold">{incidente.categoriaNombre}</h1>
+            <h1 className="mt-1 text-sm font-semibold text-[#333333]">{incidente.categoriaNombre}</h1>
           </div>
-          <span className="shrink-0 rounded-full bg-white px-2.5 py-1 text-[10px] font-extrabold uppercase">{incidente.estadoNombre}</span>
+          <span className="shrink-0 rounded-full bg-white text-[#333333] px-2.5 py-1 text-[10px] font-extrabold uppercase">{incidente.estadoNombre}</span>
         </section>
 
         <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
@@ -64,7 +68,7 @@ const DetalleIncidente = () => {
           </div>
           <div className="mt-3 flex h-2.5 overflow-hidden rounded-full bg-slate-200" aria-label={`${confianza}% de confianza`}>
             <span className="h-full bg-emerald-500" style={{ width: `${confianza}%` }} />
-            <span className="h-full flex-1 bg-red-500" />
+            <span className="h-full flex-1 bg-[#bc7171]" />
           </div>
           <p className="mt-2 text-center text-xs font-semibold text-slate-500">
             {incidente.conteoVotosPositivos || 0} confirmaron, {incidente.conteoVotosNegativos || 0} rechazaron
@@ -85,7 +89,7 @@ const DetalleIncidente = () => {
         </section>
 
         <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-          <h2 className="font-extrabold text-slate-900">¿Qué ocurre en tu zona?</h2>
+          <h2 className="font-extrabold text-slate-900">¿Qué ocurre ahora en la zona?</h2>
           <p className="mt-1 text-sm text-slate-600">Tu confirmación ayuda a mantener informada a la comunidad.</p>
 
           {user ? (

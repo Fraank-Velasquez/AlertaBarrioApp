@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
-
+import { Icon } from '@iconify/react';
 const Reportar = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -105,7 +105,7 @@ const Reportar = () => {
       navigate('/feed', {
         state: {
           toast: res.data.duplicado
-            ? 'El incidente ya se encuentra registrado en esta ubicación.'
+            ? 'El incidente de este tipo ya se encuentra registrado en esta ubicación.'
             : 'Incidente registrado correctamente.',
         },
       });
@@ -154,11 +154,29 @@ const Reportar = () => {
               {categorias.map((categoria) => {
                 const activa = String(categoriaId) === String(categoria.idCategoria);
                 const nombre = categoria.nombre || 'Incidente';
-                const icono = nombre.toLowerCase().includes('inund') ? '◉'
-                  : nombre.toLowerCase().includes('daño') || nombre.toLowerCase().includes('estruct') ? '▣'
-                    : nombre.toLowerCase().includes('vía') || nombre.toLowerCase().includes('calle') ? '◩'
-                      : nombre.toLowerCase().includes('poste') || nombre.toLowerCase().includes('cable') ? 'ϟ'
-                        : nombre.toLowerCase().includes('incend') ? '♨' : '✳';
+                const icono = nombre.toLowerCase().includes('inund') ? <Icon icon="entypo:water"
+                  width="25"
+                  height="25"
+                  color='#045bd6' />
+                  : nombre.toLowerCase().includes('daño') || nombre.toLowerCase().includes('estruct') ? <Icon icon="carbon:earthquake"
+                    width="25"
+                    height="25"
+                    color='#045bd6' />
+                    : nombre.toLowerCase().includes('vía') || nombre.toLowerCase().includes('calle') ? <Icon icon="proicons:road-barrier"
+                      width="25"
+                      height="25"
+                      color='#045bd6' />
+                      : nombre.toLowerCase().includes('poste') || nombre.toLowerCase().includes('cable') ? <Icon icon="pinhead:utility-pole"
+                        width="25"
+                        height="25"
+                        color='#045bd6' />
+                        : nombre.toLowerCase().includes('incend') ? <Icon icon="carbon:fire"
+                          width="25"
+                          height="25"
+                          color='#045bd6' /> : <Icon icon="carbon:warning-other"
+                            width="25"
+                            height="25"
+                            color='#045bd6' />;
 
                 return (
                   <button
@@ -166,9 +184,8 @@ const Reportar = () => {
                     key={categoria.idCategoria}
                     onClick={() => setCategoriaId(String(categoria.idCategoria))}
                     aria-pressed={activa}
-                    className={`flex min-h-28 flex-col items-center justify-center gap-2 rounded-xl border-2 px-3 py-4 text-center transition ${
-                      activa ? 'border-blue-700 bg-blue-50 text-blue-800' : 'border-slate-200 bg-white text-slate-800 hover:border-blue-300'
-                    }`}
+                    className={`flex min-h-28 flex-col items-center justify-center gap-2 rounded-xl border-2 px-3 py-4 text-center transition ${activa ? 'border-blue-700 bg-blue-50 text-blue-800' : 'border-slate-200 bg-white text-slate-800 hover:border-blue-300'
+                      }`}
                   >
                     <span className="text-3xl font-bold text-blue-700" aria-hidden="true">{icono}</span>
                     <span className="text-sm font-bold leading-5">{nombre}</span>
