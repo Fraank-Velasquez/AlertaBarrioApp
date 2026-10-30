@@ -3,6 +3,7 @@ import api from '../services/api';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { resolveMediaUrl } from '../utils/media';
 import PerfilUsuarioModal from '../components/PerfilUsuarioModal';
+import { Icon } from '@iconify/react';
 
 const distanciaMetros = (lat1, lon1, lat2, lon2) => {
   const radioTierra = 6371000;
@@ -25,13 +26,33 @@ const tiempoTranscurrido = (fecha) => {
   return `Hace ${Math.floor(horas / 24)} d`;
 };
 
-const iconoCategoria = (nombre = '') => {
+const iconoCategoria = (nombre = '', seleccionado = true) => {
   const categoria = nombre.toLowerCase();
-  if (categoria.includes('inund')) return '🌊';
-  if (categoria.includes('poste') || categoria.includes('cable')) return '⚡';
-  if (categoria.includes('incend')) return '🔥';
-  if (categoria.includes('vía') || categoria.includes('calle')) return '🚧';
-  return '✳';
+  const color = seleccionado ? '#ffffff' : '#4d545e';
+
+  if (categoria.includes('inund'))
+    return <Icon icon="entypo:water"
+      width="20"
+      height="20"
+      color={color} />;
+  if (categoria.includes('poste') || categoria.includes('cable'))
+    return <Icon icon="pinhead:utility-pole"
+      width="20"
+      height="20"
+      color={color} />;
+  if (categoria.includes('incend')) return <Icon icon="carbon:fire"
+    width="20"
+    height="20"
+    color={color} />;
+  if (categoria.includes('vía') || categoria.includes('calle'))
+    return <Icon icon="proicons:road-barrier"
+      width="20"
+      height="20"
+      color={color} />;
+  return <Icon icon="ic:baseline-border-all"
+    width="20"
+    height="20"
+    color={color} />;
 };
 
 const colorCategoria = (nombre = '') => {
@@ -159,11 +180,10 @@ const Feed = () => {
                 key={filtro}
                 onClick={() => setCategoria(filtro)}
                 aria-pressed={categoria === filtro}
-                className={`shrink-0 rounded-full px-4 py-2 text-xs font-bold transition ${
-                  categoria === filtro ? 'bg-blue-700 text-white' : 'bg-white text-slate-600 hover:bg-blue-50'
-                }`}
+                className={`shrink-0 rounded-full px-4 py-2 text-xs font-bold transition flex gap-2 justify-center items-center ${categoria === filtro ? 'bg-blue-700 text-white' : 'bg-white text-slate-600 hover:bg-blue-50'
+                  }`}
               >
-                {filtro !== 'Todos' && <span aria-hidden="true">{iconoCategoria(filtro)} </span>}{filtro}
+                {filtro !== 'Todos' && <span aria-hidden="true">{iconoCategoria(filtro, categoria === filtro)} </span>}{filtro}
               </button>
             ))}
           </div>

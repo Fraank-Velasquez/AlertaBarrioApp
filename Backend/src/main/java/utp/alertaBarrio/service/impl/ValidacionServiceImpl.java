@@ -30,9 +30,7 @@ public class ValidacionServiceImpl implements ValidacionService {
     private final EstadoIncidenteDao estadoIncidenteDao;
     private final GeometryFactory geometryFactory;
 
-    public ValidacionServiceImpl(ValidacionDao validacionDao, IncidenteDao incidenteDao, UsuarioDao usuarioDao,
-                                 TipoVotoDao tipoVotoDao, EstadoIncidenteDao estadoIncidenteDao,
-                                 GeometryFactory geometryFactory) {
+    public ValidacionServiceImpl(ValidacionDao validacionDao, IncidenteDao incidenteDao, UsuarioDao usuarioDao, TipoVotoDao tipoVotoDao, EstadoIncidenteDao estadoIncidenteDao, GeometryFactory geometryFactory) {
         this.validacionDao = validacionDao;
         this.incidenteDao = incidenteDao;
         this.usuarioDao = usuarioDao;
@@ -108,7 +106,7 @@ public class ValidacionServiceImpl implements ValidacionService {
     }
 
     private boolean esVotoConfirmacion(String nombreTipoVoto) {
-        return "CONFIRMAR".equalsIgnoreCase(nombreTipoVoto)
-                || "CONFIRMADO".equalsIgnoreCase(nombreTipoVoto);
+        return nombreTipoVoto != null
+                && nombreTipoVoto.trim().toUpperCase().startsWith("CONFIRMAR");
     }
 }

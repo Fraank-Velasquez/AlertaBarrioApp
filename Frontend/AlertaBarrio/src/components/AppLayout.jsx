@@ -30,14 +30,6 @@ const MenuIcon = () => (
   </svg>
 );
 
-const UserRoundIcon = () => (
-  <svg aria-hidden="true" viewBox="0 0 24 24" className="h-[21px] w-[21px]" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="10" />
-    <circle cx="12" cy="10" r="3" />
-    <path d="M6.2 18.5a6.5 6.5 0 0 1 11.6 0" />
-  </svg>
-);
-
 const RssIcon = () => (
   <svg aria-hidden="true" viewBox="0 0 24 24" className="h-[21px] w-[21px]" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M4 11a9 9 0 0 1 9 9M4 4a16 16 0 0 1 16 16" />
@@ -84,9 +76,8 @@ const AppLayout = () => {
     navigate('/');
   };
 
-  const linkClass = ({ isActive }) => `whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold transition ${
-    isActive ? 'bg-blue-50 text-blue-800' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-  }`;
+  const linkClass = ({ isActive }) => `whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold transition ${isActive ? 'bg-blue-50 text-blue-800' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+    }`;
 
   return (
     <div className={`flex flex-col ${isMap ? 'h-[100dvh] overflow-hidden' : 'min-h-[100dvh]'}`}>
@@ -110,7 +101,7 @@ const AppLayout = () => {
                 <BellIcon />
               </NavLink>
               <NavLink to={user ? '/perfil' : '/login'} onClick={cerrarMenu} aria-label={user ? 'Mi cuenta' : 'Iniciar sesión'} className="grid h-[33px] w-[33px] place-items-center rounded-full bg-[#DCE8FC] text-[#45566F] hover:bg-[#cfe0fb]">
-                <UserRoundIcon />
+                <PersonIcon />
               </NavLink>
             </div>
           </div>
@@ -133,7 +124,7 @@ const AppLayout = () => {
         <header className="relative z-[1000] shrink-0 border-b border-slate-200 bg-white">
           <div className="mx-auto hidden min-h-[68px] max-w-7xl items-center justify-between gap-4 px-4 sm:flex sm:px-6">
             <NavLink to="/" className="flex shrink-0 items-center gap-2.5" aria-label="AlertaBarrio, inicio">
-              <span className="grid h-10 w-10 place-items-center rounded-xl bg-blue-700 text-lg font-black text-white">A</span>
+              <span className="grid h-10 w-10 place-items-center rounded-xl bg-blue-700 text-lg font-black text-white"></span>
               <span className="text-lg font-extrabold tracking-tight text-slate-900">
                 Alerta<span className="text-blue-700">Barrio</span>
               </span>
@@ -227,10 +218,10 @@ const AppLayout = () => {
           <PlusCircleIcon />
         </NavLink>
         <NavLink to="/directorio" className={({ isActive }) => `mobile-tab ${isActive ? 'mobile-tab-active' : ''}`}>
-          <SirenIcon /><span className="text-center leading-tight">SOS emergencias</span>
+          <SirenIcon /><span className="text-center leading-tight">emergencias</span>
         </NavLink>
         <NavLink to={user ? '/perfil' : '/login'} className={({ isActive }) => `mobile-tab ${isActive ? 'mobile-tab-active' : ''}`}>
-          <UserRoundIcon /><span>Profile</span>
+          <PersonIcon /><span>Perfil</span>
         </NavLink>
       </nav>}
 

@@ -26,7 +26,7 @@ const Login = () => {
       <header className="grid h-14 grid-cols-[1fr_auto_1fr] items-center bg-blue-700 px-4 text-white shadow-sm">
         <button type="button" onClick={() => navigate('/')} aria-label="Volver al inicio" className="justify-self-start p-2 text-2xl leading-none">‹</button>
         <h1 className="text-base font-bold">Iniciar Sesión</h1>
-        <span className="justify-self-end p-2 text-lg" aria-hidden="true">♧</span>
+
       </header>
 
       <div className="mx-auto max-w-md px-4 pb-8 pt-6 sm:pt-12">

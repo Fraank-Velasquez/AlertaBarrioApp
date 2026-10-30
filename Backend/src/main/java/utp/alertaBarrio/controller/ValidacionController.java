@@ -22,15 +22,13 @@ public class ValidacionController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> emitir(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                       @RequestBody ValidacionRequest request) {
+    public ResponseEntity<Void> emitir(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody ValidacionRequest request) {
         validacionService.emitirValidacion(request, userDetails.getUsuarioId());
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/con-ubicacion")
-    public ResponseEntity<Void> emitirConUbicacion(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                                   @RequestBody ValidacionConUbicacionRequest request) {
+    public ResponseEntity<Void> emitirConUbicacion(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody ValidacionConUbicacionRequest request) {
         ((ValidacionServiceImpl) validacionService).emitirValidacionConUbicacion(
                 request.getIncidenteId(), request.getTipoVotoId(), request.getNotaActualizacionRapida(),
                 request.getFotoEvidenciaUrl(), request.getLatitud(), request.getLongitud(), userDetails.getUsuarioId());
