@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import AuthRequiredModal from './AuthRequiredModal';
+import { Icon } from '@iconify/react';
 
 const navigation = [
   { to: '/mapa', label: 'Mapa' },
@@ -123,10 +124,13 @@ const AppLayout = () => {
       ) : (
         <header className="relative z-[1000] shrink-0 border-b border-slate-200 bg-white">
           <div className="mx-auto hidden min-h-[68px] max-w-7xl items-center justify-between gap-4 px-4 sm:flex sm:px-6">
-            <NavLink to="/" className="flex shrink-0 items-center gap-2.5" aria-label="AlertaBarrio, inicio">
-              <span className="grid h-10 w-10 place-items-center rounded-xl bg-blue-700 text-lg font-black text-white"></span>
-              <span className="text-lg font-extrabold tracking-tight text-slate-900">
-                Alerta<span className="text-blue-700">Barrio</span>
+            <NavLink to="/" className="flex shrink-0 items-center gap-2" aria-label="AlertaBarrio, inicio">
+              <span className="grid h-10 w-10 place-items-center rounded-xl"><Icon icon="material-symbols-light:motion-sensor-alert"
+                width="30"
+                height="30"
+                color='#1D4ED8' /></span>
+              <span className="text-lg font-extrabold tracking-tight text-blue-700">
+                Alerta Barrio
               </span>
             </NavLink>
 

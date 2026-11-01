@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
+import { Icon } from '@iconify/react';
 
 const Login = () => {
   const { login } = useAuth();
@@ -38,16 +39,16 @@ const Login = () => {
             </svg>
           </span>
           <h2 className="mt-4 text-2xl font-extrabold tracking-tight text-slate-900">Bienvenido de nuevo</h2>
-          <p className="mt-2 text-base leading-6 text-slate-600">Ingresa tus credenciales para acceder a tus alertas y reputación vecinal.</p>
+          <p className="mt-2 text-base leading-6 text-slate-600">Ingresa tus credenciales para acceder y ver alertas cercanas.</p>
         </div>
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-4">
           {error && <p role="alert" className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700">{error}</p>}
           <label className="block text-xs font-bold text-slate-700">
             Correo Electrónico
-            <span className="mt-1 block rounded-lg border border-slate-300 bg-white px-3">
+            <span className="mt-10 block rounded-lg border border-slate-300 bg-white px-3">
               <input
-                className="h-12 w-full bg-transparent text-base font-normal text-slate-900 outline-none placeholder:text-slate-400"
+                className="h-12 w-full focus-visible:outline-none bg-transparent text-base font-normal text-slate-900 placeholder:text-slate-400"
                 type="email"
                 autoComplete="email"
                 placeholder="ejemplo@correo.com"
@@ -60,9 +61,9 @@ const Login = () => {
 
           <label className="block text-xs font-bold text-slate-700">
             Contraseña
-            <span className="mt-1 flex h-12 items-center rounded-lg border border-slate-300 bg-white px-3">
+            <span className="mt-1 flex  h-12 items-center rounded-lg border border-slate-300 bg-white px-3">
               <input
-                className="min-w-0 flex-1 bg-transparent text-base font-normal text-slate-900 outline-none placeholder:text-slate-400"
+                className="min-w-0 flex-1 focus-visible:outline-none bg-transparent text-base font-normal text-slate-900  placeholder:text-slate-400"
                 type={mostrarContrasena ? 'text' : 'password'}
                 autoComplete="current-password"
                 placeholder="••••••••"
@@ -71,7 +72,13 @@ const Login = () => {
                 required
               />
               <button type="button" onClick={() => setMostrarContrasena((mostrar) => !mostrar)} aria-label={mostrarContrasena ? 'Ocultar contraseña' : 'Mostrar contraseña'} className="px-1 text-lg text-slate-500">
-                {mostrarContrasena ? '◉' : '◎'}
+                {mostrarContrasena ? <Icon icon="ic:outline-remove-red-eye"
+                  width="25"
+                  height="25"
+                  color='#1D4ED8' /> : <Icon icon="boxicons:eye-slash"
+                    width="25"
+                    height="25"
+                    color='#1D4ED8' />}
               </button>
             </span>
           </label>
@@ -82,7 +89,7 @@ const Login = () => {
         </form>
 
         <p className="mt-10 text-center text-sm text-slate-600">
-          ¿No tienes una cuenta vecinal? <Link to="/register" className="font-semibold text-blue-700 hover:underline">Regístrate gratis</Link>
+          ¿No tienes una cuenta ? <Link to="/register" className="font-semibold text-blue-700 hover:underline">Regístrate gratis</Link>
         </p>
       </div>
     </div>
