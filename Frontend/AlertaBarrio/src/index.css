@@ -50,7 +50,7 @@ a {
   text-decoration: none;
 }
 
-.mobile-tab > span:last-child {
+.mobile-tab>span:last-child {
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -107,6 +107,14 @@ a {
 .map-marker--flood {
   background: #0756c9;
   border: 2px solid #fff;
+}
+
+.map-marker--user {
+  background: transparent;
+  color: #0756c9;
+  border: none;
+  box-shadow: none;
+  filter: drop-shadow(0 2px 4px rgb(0 0 0 / 35%));
 }
 
 .heat-blob {

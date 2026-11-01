@@ -129,9 +129,8 @@ const AuthRequiredModalContent = ({ onClose }) => {
             />
             <span
               aria-hidden="true"
-              className={`mt-px grid h-5 w-5 shrink-0 place-items-center rounded-[5px] border transition ${
-                aceptaTerminos ? 'border-[#004BC7] bg-[#004BC7] text-white' : 'border-[#94A3B8] bg-white text-transparent'
-              }`}
+              className={`mt-px grid h-5 w-5 shrink-0 place-items-center rounded-[5px] border transition ${aceptaTerminos ? 'border-[#004BC7] bg-[#004BC7] text-white' : 'border-[#94A3B8] bg-white text-transparent'
+                }`}
             >
               <CheckIcon />
             </span>
@@ -171,17 +170,6 @@ const AuthRequiredModalContent = ({ onClose }) => {
               checked={notificaciones}
               onChange={cambiarNotificaciones}
             />
-            <span
-              aria-hidden="true"
-              className={`mt-px grid h-5 w-5 shrink-0 place-items-center rounded-[5px] border transition ${
-                notificaciones ? 'border-[#004BC7] bg-[#004BC7] text-white' : 'border-[#94A3B8] bg-white text-transparent'
-              }`}
-            >
-              <CheckIcon />
-            </span>
-            <span className="text-[13.5px] font-normal leading-[19px] text-[#334155]">
-              Acepto recibir notificaciones push de emergencias en mi radio barrial.
-            </span>
           </label>
         </div>
 

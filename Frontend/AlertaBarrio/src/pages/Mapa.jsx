@@ -14,6 +14,8 @@ const warningSvg = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" 
 
 const floodSvg = '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M12 2.5S5.5 9.1 5.5 14a6.5 6.5 0 0 0 13 0C18.5 9.1 12 2.5 12 2.5Z"/></svg>';
 
+const userLocationSvg = '<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="m10.95 11.173l-1.046-1.046q-.146-.146-.344-.156q-.199-.01-.364.156q-.165.165-.165.357t.165.357l1.188 1.194q.243.242.566.242t.566-.242l3.338-3.339q.146-.146.156-.347t-.156-.366q-.165-.166-.357-.166t-.357.166zm8.146-.877q0 1.279-.572 2.613q-.572 1.333-1.458 2.632q-.885 1.3-1.981 2.494T12.92 20.21q-.198.173-.442.26t-.479.086t-.47-.077q-.234-.077-.432-.25q-1.067-.981-2.164-2.185q-1.096-1.203-1.99-2.493t-1.468-2.633t-.572-2.622q0-3.173 2.066-5.234Q9.037 3 12 3t5.03 2.062q2.066 2.061 2.066 5.234"/></svg>';
+
 const getTipoMarcador = (categoria = '') => {
   const nombre = categoria.toLowerCase();
   if (nombre.includes('incend') || nombre.includes('fuego') || nombre.includes('humo')) return 'fire';
@@ -34,6 +36,13 @@ const crearIconoMarcador = (categoria) => {
   });
 };
 
+const crearIconoUbicacion = () => L.divIcon({
+  className: '',
+  html: `<span class="map-marker map-marker--user" style="width:40px;height:40px">${userLocationSvg}</span>`,
+  iconSize: [40, 40],
+  iconAnchor: [20, 20],
+});
+
 const Recenter = ({ position }) => {
   const map = useMap();
   useEffect(() => {
@@ -46,6 +55,7 @@ const Mapa = () => {
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
   const [position, setPosition] = useState(PIURA);
+  const [ubicacionUsuario, setUbicacionUsuario] = useState(null);
   const [incidentes, setIncidentes] = useState([]);
   const [distrito, setDistrito] = useState('Piura');
 
@@ -79,6 +89,7 @@ const Mapa = () => {
       (pos) => {
         const coords = [pos.coords.latitude, pos.coords.longitude];
         setPosition(coords);
+        setUbicacionUsuario(coords);
         cargarIncidentes();
       },
       () => cargarIncidentes(),
@@ -117,6 +128,15 @@ const Mapa = () => {
           />
 
           <Recenter position={position} />
+
+          {ubicacionUsuario && (
+            <Marker
+              position={ubicacionUsuario}
+              icon={crearIconoUbicacion()}
+              zIndexOffset={500}
+              interactive={false}
+            />
+          )}
 
           {incidentes.map((incidente) => (
             <Marker
