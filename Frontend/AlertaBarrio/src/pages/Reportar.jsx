@@ -193,7 +193,7 @@ const Reportar = () => {
                 );
               })}
             </div>
-            <button type="button" onClick={() => setPaso(2)} disabled={!categoriaId} className="mt-8 w-full rounded-full bg-blue-700 py-4 text-base font-extrabold uppercase text-white shadow-sm transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:bg-slate-300">
+            <button type="button" onClick={() => setPaso(2)} disabled={!categoriaId} className="mt-8 w-full rounded-[20px] bg-blue-700 py-4 text-base font-extrabold uppercase text-white shadow-sm transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:bg-slate-300">
               Continuar
             </button>
           </>
@@ -240,7 +240,7 @@ const Reportar = () => {
         )}
 
         <div className="mt-6 border-t border-slate-300 pt-5 text-center">
-          <Link to="/feed" className="block rounded-full bg-red-600 py-3 text-sm font-extrabold text-white shadow-sm hover:bg-red-700">
+          <Link to="/feed" className="block rounded-[20px] bg-[#FF3366] py-3 text-sm font-extrabold text-white shadow-sm hover:bg-red-700">
             Ver alertas en vivo
           </Link>
           <p className="mt-4 text-[10px] font-bold uppercase tracking-wide text-slate-500">
