@@ -14,6 +14,7 @@ public class IncidenteDTO {
     private String estadoNombre;
     private Double latitud;
     private Double longitud;
+    private String distrito;
     private String descripcion;
     private String fotoEvidenciaUrl;
     private LocalDateTime fechaHoraReporte;
@@ -93,6 +94,14 @@ public class IncidenteDTO {
 
     public void setLongitud(Double longitud) {
         this.longitud = longitud;
+    }
+
+    public String getDistrito() {
+        return distrito;
+    }
+
+    public void setDistrito(String distrito) {
+        this.distrito = distrito;
     }
 
     public String getDescripcion() {

@@ -3,6 +3,20 @@ import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { Icon } from '@iconify/react';
+
+const CameraIcon = () => (
+  <svg aria-hidden="true" viewBox="0 0 24 24" className="h-8 w-8" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M4 7h3l1.5-2h7L17 7h3v12H4V7Z" />
+    <circle cx="12" cy="13" r="3.5" />
+  </svg>
+);
+
+const LocationIcon = () => (
+  <svg aria-hidden="true" viewBox="0 0 24 24" className="h-6 w-6" fill="currentColor">
+    <path d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5Z" />
+  </svg>
+);
+
 const Reportar = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -18,6 +32,7 @@ const Reportar = () => {
   const [mensaje, setMensaje] = useState('');
   const [enviando, setEnviando] = useState(false);
   const [paso, setPaso] = useState(1);
+  const [conflictoUbicacion, setConflictoUbicacion] = useState(null);
 
   useEffect(() => {
     api.get('/public/catalogos/categorias')
@@ -31,6 +46,8 @@ const Reportar = () => {
         setLat(pos.coords.latitude);
         setLng(pos.coords.longitude);
         setPrecision(pos.coords.accuracy);
+        setCargandoDireccion(true);
+        setDireccion(null);
       },
       () => setMensaje('Activa el permiso de ubicación para poder reportar un incidente.'),
       { timeout: 10000 }
@@ -41,8 +58,6 @@ const Reportar = () => {
     if (lat === null || lng === null) return undefined;
 
     const controller = new AbortController();
-    setCargandoDireccion(true);
-    setDireccion(null);
 
     const params = new URLSearchParams({
       format: 'jsonv2',
@@ -97,6 +112,7 @@ const Reportar = () => {
         descripcion,
         latitud: lat,
         longitud: lng,
+        distrito: direccion?.distrito || null,
       };
       const formulario = new FormData();
       formulario.append('datos', new Blob([JSON.stringify(datos)], { type: 'application/json' }));
@@ -110,25 +126,16 @@ const Reportar = () => {
         },
       });
     } catch (err) {
-      setMensaje(err.response?.data?.mensaje || 'Error al reportar');
+      if (err.response?.status === 409 && err.response?.data?.codigo === 'UBICACION_CERCANA') {
+        setConflictoUbicacion(err.response.data);
+      } else {
+        setMensaje(err.response?.data?.mensaje || 'Error al reportar');
+      }
       setEnviando(false);
     }
   };
 
   if (!user) return <div className="p-4">Debes iniciar sesión para reportar</div>;
-
-  const CameraIcon = () => (
-    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-8 w-8" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M4 7h3l1.5-2h7L17 7h3v12H4V7Z" />
-      <circle cx="12" cy="13" r="3.5" />
-    </svg>
-  );
-
-  const LocationIcon = () => (
-    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-6 w-6" fill="currentColor">
-      <path d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5Z" />
-    </svg>
-  );
 
   return (
     <div className="min-h-full bg-[#f5f7fa] px-4 pb-8 pt-5">
@@ -248,6 +255,48 @@ const Reportar = () => {
           </p>
         </div>
       </div>
+
+      {conflictoUbicacion && (
+        <div
+          className="fixed inset-0 z-[2000] flex items-center justify-center bg-slate-900/60 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="ubicacion-cercana-titulo"
+        >
+          <div className="w-full max-w-md rounded-2xl bg-white p-5 shadow-2xl">
+            <div className="flex items-start gap-3">
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-amber-50 text-amber-700">
+                <Icon icon="material-symbols:location-on-outline" width="24" height="24" aria-hidden="true" />
+              </span>
+              <div>
+                <h2 id="ubicacion-cercana-titulo" className="text-lg font-extrabold text-slate-900">
+                  {conflictoUbicacion.mismoTipo ? 'Ya existe una alerta de este tipo' : 'Ya existe una alerta cerca'}
+                </h2>
+                <p className="mt-1 text-sm leading-6 text-slate-600">{conflictoUbicacion.mensaje}</p>
+              </div>
+            </div>
+
+            <div className="mt-5 flex flex-wrap justify-end gap-2">
+              {conflictoUbicacion.incidente?.incidenteId && (
+                <Link
+                  to={`/incidente/${conflictoUbicacion.incidente.incidenteId}`}
+                  onClick={() => setConflictoUbicacion(null)}
+                  className="rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:bg-slate-50"
+                >
+                  Ver alerta existente
+                </Link>
+              )}
+              <button
+                type="button"
+                onClick={() => setConflictoUbicacion(null)}
+                className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-extrabold text-white transition hover:bg-slate-800"
+              >
+                Entendido
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

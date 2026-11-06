@@ -3,6 +3,7 @@ import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import AuthRequiredModal from './AuthRequiredModal';
 import { Icon } from '@iconify/react';
+import { esRolAutoridad } from '../utils/roles';
 
 const navigation = [
   { to: '/mapa', label: 'Mapa' },
@@ -108,7 +109,7 @@ const AppLayout = () => {
           </div>
           {menuOpen && (
             <nav aria-label="Navegación móvil" className="absolute inset-x-0 top-full z-[1100] border-b border-slate-200 bg-white p-3 shadow-lg">
-              {[...navigation, ...(user?.rol === 'AUTORIDAD' ? [{ to: '/admin', label: 'Autoridades' }] : [])].map(({ to, label, end }) => (
+              {[...navigation, ...(esRolAutoridad(user?.rol) ? [{ to: '/admin', label: 'Autoridades' }] : [])].map(({ to, label, end }) => (
                 <NavLink key={to} to={to} end={end} onClick={cerrarMenu} className={({ isActive }) => `block rounded-lg px-4 py-3 text-sm font-semibold ${isActive ? 'bg-blue-50 text-blue-800' : 'text-slate-700 hover:bg-slate-50'}`}>
                   {label}
                 </NavLink>
@@ -138,7 +139,7 @@ const AppLayout = () => {
               {navigation.map(({ to, label, end }) => (
                 <NavLink key={to} to={to} end={end} className={linkClass}>{label}</NavLink>
               ))}
-              {user?.rol === 'AUTORIDAD' && (
+              {esRolAutoridad(user?.rol) && (
                 <NavLink to="/admin" className={linkClass}>Autoridades</NavLink>
               )}
             </nav>
@@ -182,7 +183,7 @@ const AppLayout = () => {
 
           {menuOpen && (
             <nav aria-label="Navegación móvil" className="absolute inset-x-0 top-full z-[1100] border-b border-slate-200 bg-white p-3 shadow-lg sm:hidden">
-              {[...navigation, ...(user?.rol === 'AUTORIDAD' ? [{ to: '/admin', label: 'Autoridades' }] : [])].map(({ to, label, end }) => (
+              {[...navigation, ...(esRolAutoridad(user?.rol) ? [{ to: '/admin', label: 'Autoridades' }] : [])].map(({ to, label, end }) => (
                 <NavLink key={to} to={to} end={end} onClick={cerrarMenu} className={({ isActive }) => `block rounded-lg px-4 py-3 text-sm font-semibold ${isActive ? 'bg-blue-50 text-blue-800' : 'text-slate-700 hover:bg-slate-50'}`}>
                   {label}
                 </NavLink>

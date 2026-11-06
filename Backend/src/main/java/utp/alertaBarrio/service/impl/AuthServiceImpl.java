@@ -16,6 +16,7 @@ import utp.alertaBarrio.repository.UsuarioDao;
 import utp.alertaBarrio.security.CustomUserDetails;
 import utp.alertaBarrio.security.JwtTokenProvider;
 import utp.alertaBarrio.service.AuthService;
+import utp.alertaBarrio.service.ReputacionService;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -24,14 +25,17 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider tokenProvider;
+    private final ReputacionService reputacionService;
 
     public AuthServiceImpl(UsuarioDao usuarioDao, RolDao rolDao, PasswordEncoder passwordEncoder,
-                           AuthenticationManager authenticationManager, JwtTokenProvider tokenProvider) {
+                           AuthenticationManager authenticationManager, JwtTokenProvider tokenProvider,
+                           ReputacionService reputacionService) {
         this.usuarioDao = usuarioDao;
         this.rolDao = rolDao;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.tokenProvider = tokenProvider;
+        this.reputacionService = reputacionService;
     }
 
     @Override
@@ -54,7 +58,8 @@ public class AuthServiceImpl implements AuthService {
                 .activo(true)
                 .build();
 
-        Usuario saved = usuarioDao.save(usuario);
+        Usuario saved = usuarioDao.saveAndFlush(usuario);
+        reputacionService.obtenerOCrear(saved.getUsuarioId());
 
         CustomUserDetails userDetails = new CustomUserDetails(
                 saved.getUsuarioId(),

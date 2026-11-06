@@ -12,6 +12,7 @@ import utp.alertaBarrio.repository.IncidenteDao;
 import utp.alertaBarrio.repository.IntervencionAutoridadDao;
 import utp.alertaBarrio.repository.UsuarioDao;
 import utp.alertaBarrio.service.AutoridadService;
+import utp.alertaBarrio.service.ReputacionService;
 
 import java.util.UUID;
 
@@ -21,14 +22,36 @@ public class AutoridadServiceImpl implements AutoridadService {
     private final UsuarioDao usuarioDao;
     private final EstadoIncidenteDao estadoIncidenteDao;
     private final IntervencionAutoridadDao intervencionAutoridadDao;
+    private final ReputacionService reputacionService;
 
     public AutoridadServiceImpl(IncidenteDao incidenteDao, UsuarioDao usuarioDao,
                                 EstadoIncidenteDao estadoIncidenteDao,
-                                IntervencionAutoridadDao intervencionAutoridadDao) {
+                                IntervencionAutoridadDao intervencionAutoridadDao,
+                                ReputacionService reputacionService) {
         this.incidenteDao = incidenteDao;
         this.usuarioDao = usuarioDao;
         this.estadoIncidenteDao = estadoIncidenteDao;
         this.intervencionAutoridadDao = intervencionAutoridadDao;
+        this.reputacionService = reputacionService;
+    }
+
+    @Override
+    @Transactional
+    public Incidente despachar(UUID incidenteId, UUID autoridadId, IntervencionRequest request) {
+        Incidente incidente = incidenteDao.findById(incidenteId)
+                .orElseThrow(() -> new RuntimeException("Incidente no encontrado"));
+        Usuario autoridad = usuarioDao.findById(autoridadId)
+                .orElseThrow(() -> new RuntimeException("Autoridad no encontrada"));
+
+        EstadoIncidente enRevision = estadoIncidenteDao.findByNombre("EN_REVISION").orElse(null);
+        if (enRevision != null) {
+            incidente.setEstado(enRevision);
+        }
+
+        guardarIntervencion(incidente, autoridad, request);
+        Incidente actualizado = incidenteDao.save(incidente);
+        reputacionService.recalcularPorIncidente(actualizado.getIncidenteId());
+        return actualizado;
     }
 
     @Override
@@ -43,15 +66,25 @@ public class AutoridadServiceImpl implements AutoridadService {
                 .orElseThrow(() -> new RuntimeException("Estado RESUELTO no encontrado"));
         incidente.setEstado(resuelto);
 
-        IntervencionAutoridad intervencion = IntervencionAutoridad.builder()
-                .incidente(incidente)
-                .usuario(autoridad)
-                .unidadDespachada(request.getUnidadDespachada())
-                .mensajeComunicadoOficial(request.getMensajeComunicadoOficial())
-                .build();
-        intervencionAutoridadDao.save(intervencion);
+        guardarIntervencion(incidente, autoridad, request);
+        Incidente actualizado = incidenteDao.save(incidente);
+        reputacionService.recalcularPorIncidente(actualizado.getIncidenteId());
+        return actualizado;
+    }
 
-        return incidenteDao.save(incidente);
+    private void guardarIntervencion(Incidente incidente, Usuario autoridad, IntervencionRequest request) {
+        IntervencionAutoridad intervencion = intervencionAutoridadDao
+                .buscarPorIncidente(incidente.getIncidenteId())
+                .orElseGet(() -> IntervencionAutoridad.builder()
+                        .incidente(incidente)
+                        .usuario(autoridad)
+                        .build());
+        intervencion.setUsuario(autoridad);
+        if (request.getUnidadDespachada() != null && !request.getUnidadDespachada().isBlank()) {
+            intervencion.setUnidadDespachada(request.getUnidadDespachada());
+        }
+        intervencion.setMensajeComunicadoOficial(request.getMensajeComunicadoOficial());
+        intervencionAutoridadDao.save(intervencion);
     }
 
     @Override
@@ -62,6 +95,8 @@ public class AutoridadServiceImpl implements AutoridadService {
         EstadoIncidente estado = estadoIncidenteDao.findById(estadoId)
                 .orElseThrow(() -> new RuntimeException("Estado no encontrado"));
         incidente.setEstado(estado);
-        return incidenteDao.save(incidente);
+        Incidente actualizado = incidenteDao.save(incidente);
+        reputacionService.recalcularPorIncidente(actualizado.getIncidenteId());
+        return actualizado;
     }
 }

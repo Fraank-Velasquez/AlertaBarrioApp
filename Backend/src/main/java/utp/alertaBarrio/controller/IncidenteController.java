@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,6 +33,7 @@ public class IncidenteController {
     }
 
     @PostMapping(consumes = "application/json")
+    @PreAuthorize("hasRole('CIUDADANO')")
     public ResponseEntity<IncidenteDTO> crear(@AuthenticationPrincipal CustomUserDetails userDetails,
                                              @Valid @RequestBody CrearIncidenteRequest request) {
         IncidenteDTO dto = incidenteService.crearIncidente(request, userDetails.getUsuarioId());
@@ -39,6 +41,7 @@ public class IncidenteController {
     }
 
     @PostMapping(consumes = "multipart/form-data")
+    @PreAuthorize("hasRole('CIUDADANO')")
     public ResponseEntity<IncidenteDTO> crearConEvidencia(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @Valid @RequestPart("datos") CrearIncidenteRequest request,
@@ -55,8 +58,8 @@ public class IncidenteController {
     }
 
     @GetMapping
-    public ResponseEntity<List<IncidenteDTO>> todosActivos() {
-        return ResponseEntity.ok(incidenteService.listarTodosActivos());
+    public ResponseEntity<List<IncidenteDTO>> todos() {
+        return ResponseEntity.ok(incidenteService.listarTodos());
     }
 
     @GetMapping("/{id}")

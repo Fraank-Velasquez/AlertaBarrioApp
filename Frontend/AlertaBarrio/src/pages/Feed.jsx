@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import api from '../services/api';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { resolveMediaUrl } from '../utils/media';
@@ -62,6 +62,18 @@ const colorCategoria = (nombre = '') => {
   return 'border-red-500';
 };
 
+const estiloEstado = (nombre = '') => {
+  const normalizado = nombre
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
+  if (normalizado.includes('resuelt') || normalizado.includes('atendid')) return 'bg-blue-50 text-blue-700';
+  if (normalizado.includes('confirm')) return 'bg-emerald-50 text-emerald-700';
+  if (normalizado.includes('rechaz') || normalizado.includes('descar') || normalizado.includes('falsa')) return 'bg-rose-50 text-rose-700';
+  if (normalizado.includes('revision')) return 'bg-amber-50 text-amber-800';
+  return 'bg-slate-100 text-slate-600';
+};
+
 const Feed = () => {
   const [incidentes, setIncidentes] = useState([]);
   const [lat, setLat] = useState(null);
@@ -77,17 +89,20 @@ const Feed = () => {
 
   useEffect(() => {
     if (!location.state?.toast) return undefined;
-    setToast(location.state.toast);
+    const mostrar = window.setTimeout(() => setToast(location.state.toast), 0);
     const timer = window.setTimeout(() => {
       setToast('');
       navigate(location.pathname, { replace: true, state: null });
     }, 3500);
-    return () => window.clearTimeout(timer);
+    return () => {
+      window.clearTimeout(mostrar);
+      window.clearTimeout(timer);
+    };
   }, [location.pathname, location.state, navigate]);
 
-  const cargar = async (la, lo, r) => {
+  const cargar = useCallback(async (silencioso = false) => {
     try {
-      setCargando(true);
+      if (!silencioso) setCargando(true);
       const res = await api.get('/incidentes');
       setIncidentes(res.data);
       setError('');
@@ -95,29 +110,42 @@ const Feed = () => {
       console.error(requestError);
       setError('No se pudieron cargar las alertas. Comprueba tu conexión e inténtalo nuevamente.');
     } finally {
-      setCargando(false);
+      if (!silencioso) setCargando(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
+    let inicial;
     if (!navigator.geolocation) {
-      cargar(null, null);
-      return;
+      inicial = window.setTimeout(() => cargar(), 0);
+    } else {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setLat(pos.coords.latitude);
+          setLng(pos.coords.longitude);
+          cargar();
+        },
+        () => {
+          cargar();
+        },
+        { enableHighAccuracy: true, timeout: 10000 }
+      );
     }
 
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setLat(pos.coords.latitude);
-        setLng(pos.coords.longitude);
-        setCargando(true);
-        cargar(pos.coords.latitude, pos.coords.longitude);
-      },
-      () => {
-        cargar(null, null);
-      },
-      { enableHighAccuracy: true, timeout: 10000 }
-    );
-  }, []);
+    return () => window.clearTimeout(inicial);
+  }, [cargar]);
+
+  useEffect(() => {
+    const intervalo = window.setInterval(() => cargar(true), 20000);
+    const alVolver = () => {
+      if (document.visibilityState === 'visible') cargar(true);
+    };
+    document.addEventListener('visibilitychange', alVolver);
+    return () => {
+      window.clearInterval(intervalo);
+      document.removeEventListener('visibilitychange', alVolver);
+    };
+  }, [cargar]);
 
   useEffect(() => {
     if (lat === null || lng === null) return undefined;
@@ -198,7 +226,7 @@ const Feed = () => {
           {error ? (
             <div role="alert" className="rounded-2xl border border-amber-200 bg-amber-50 px-5 py-5 text-sm text-amber-900 shadow-sm">
               <p className="font-bold">{error}</p>
-              <button type="button" onClick={() => cargar(lat, lng)} className="mt-3 rounded-lg bg-amber-100 px-3 py-2 font-bold hover:bg-amber-200">Reintentar</button>
+              <button type="button" onClick={() => cargar()} className="mt-3 rounded-lg bg-amber-100 px-3 py-2 font-bold hover:bg-amber-200">Reintentar</button>
             </div>
           ) : cargando ? (
             <div className="rounded-2xl bg-white px-5 py-10 text-center text-sm font-semibold text-slate-500 shadow-sm">Cargando alertas cercanas…</div>
@@ -209,7 +237,13 @@ const Feed = () => {
             </div>
           ) : incidentesVisibles.map((inc) => {
             const confianza = Math.min(100, Math.max(0, Number(inc.indiceConfianzaPorcentaje) || 0));
-            const confirmado = inc.estadoNombre?.toLowerCase().includes('confirm');
+            const estadoNormalizado = (inc.estadoNombre || '')
+              .normalize('NFD')
+              .replace(/[\u0300-\u036f]/g, '')
+              .toLowerCase();
+            const positivo = estadoNormalizado.includes('confirm')
+              || estadoNormalizado.includes('resuelt')
+              || estadoNormalizado.includes('atendid');
             const iniciales = (inc.autorNombre || 'Vecino').split(/\s+/).slice(0, 2).map((parte) => parte[0]).join('').toUpperCase();
             const distancia = lat !== null && lng !== null && inc.latitud !== null && inc.longitud !== null
               ? Math.round(distanciaMetros(lat, lng, inc.latitud, inc.longitud))
@@ -231,7 +265,7 @@ const Feed = () => {
                 </div>
 
                 <div className="mt-3 flex flex-wrap gap-2">
-                  <span className={`rounded-md px-2 py-1 text-[10px] font-bold uppercase tracking-wide ${confirmado ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-800'}`}>
+                  <span className={`rounded-md px-2 py-1 text-[10px] font-bold uppercase tracking-wide ${estiloEstado(inc.estadoNombre)}`}>
                     {inc.estadoNombre || 'En revisión'}
                   </span>
                 </div>
@@ -251,7 +285,7 @@ const Feed = () => {
                 )}
                 <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-200" aria-label={`${confianza}% de confianza`}>
                   <div
-                    className={`h-full rounded-full ${confirmado ? 'bg-emerald-500' : 'bg-amber-400'}`}
+                    className={`h-full rounded-full ${positivo ? 'bg-emerald-500' : 'bg-amber-400'}`}
                     style={{ width: `${confianza}%` }}
                   />
                 </div>

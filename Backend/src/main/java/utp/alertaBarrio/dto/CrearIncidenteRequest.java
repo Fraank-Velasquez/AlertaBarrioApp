@@ -16,6 +16,9 @@ public class CrearIncidenteRequest {
     @Size(max = 2048, message = "La URL de la foto no puede superar los 2048 caracteres")
     private String fotoEvidenciaUrl;
 
+    @Size(max = 100, message = "El distrito no puede superar los 100 caracteres")
+    private String distrito;
+
     @NotNull
     @DecimalMin(value = "-90.0", message = "La latitud debe estar entre -90 y 90")
     @DecimalMax(value = "90.0", message = "La latitud debe estar entre -90 y 90")
@@ -48,6 +51,14 @@ public class CrearIncidenteRequest {
 
     public void setFotoEvidenciaUrl(String fotoEvidenciaUrl) {
         this.fotoEvidenciaUrl = fotoEvidenciaUrl;
+    }
+
+    public String getDistrito() {
+        return distrito;
+    }
+
+    public void setDistrito(String distrito) {
+        this.distrito = distrito;
     }
 
     public Double getLatitud() {

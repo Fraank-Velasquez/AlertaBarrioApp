@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { Icon } from '@iconify/react';
+import { esRolAutoridad } from '../utils/roles';
 
 const Login = () => {
   const { login } = useAuth();
@@ -15,8 +16,8 @@ const Login = () => {
     e.preventDefault();
     setError('');
     try {
-      await login(correo, contrasena);
-      navigate('/');
+      const sesion = await login(correo, contrasena);
+      navigate(esRolAutoridad(sesion.rol) ? '/admin' : '/', { replace: true });
     } catch (err) {
       setError(err.response?.data?.mensaje || 'Credenciales inválidas');
     }

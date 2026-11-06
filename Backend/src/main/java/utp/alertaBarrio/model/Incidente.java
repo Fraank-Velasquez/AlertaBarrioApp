@@ -53,6 +53,9 @@ public class Incidente {
     @Column(columnDefinition = "TEXT")
     private String descripcion;
 
+    @Column(length = 100)
+    private String distrito;
+
     @Column(name = "foto_evidencia_url", columnDefinition = "TEXT")
     private String fotoEvidenciaUrl;
 

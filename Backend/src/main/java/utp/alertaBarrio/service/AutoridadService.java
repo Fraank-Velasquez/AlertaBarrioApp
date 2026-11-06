@@ -6,6 +6,7 @@ import utp.alertaBarrio.model.Incidente;
 import java.util.UUID;
 
 public interface AutoridadService {
+    Incidente despachar(UUID incidenteId, UUID autoridadId, IntervencionRequest request);
     Incidente marcarResuelto(UUID incidenteId, UUID autoridadId, IntervencionRequest request);
     Incidente cambiarEstado(UUID incidenteId, UUID estadoId);
 }

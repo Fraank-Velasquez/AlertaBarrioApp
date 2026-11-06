@@ -87,10 +87,9 @@ public class PerfilServiceImpl implements PerfilService {
         dto.setSectorResidencia(usuario.getSectorResidencia());
         dto.setFotoAvatarUrl(usuario.getFotoAvatarUrl());
         dto.setFechaRegistro(usuario.getFechaRegistro());
-        reputacionDao.findById(usuarioId).ifPresent(reputacion -> {
-            dto.setNivelReputacion(reputacion.getNivelReputacion());
-            dto.setPorcentajeConfiabilidad(reputacion.getPorcentajeConfiabilidad());
-        });
+        Reputacion reputacion = reputacionDe(usuarioId);
+        dto.setNivelReputacion(reputacion.getNivelReputacion());
+        dto.setPorcentajeConfiabilidad(reputacion.getPorcentajeConfiabilidad());
         dto.setSeguidores(seguidorDao.listarSeguidores(usuarioId).size());
         dto.setSiguiendo(seguidorDao.listarSeguidos(usuarioId).size());
         dto.setSiguiendoUsuario(visitanteId != null
@@ -110,7 +109,7 @@ public class PerfilServiceImpl implements PerfilService {
         dto.setFechaRegistro(usuario.getFechaRegistro());
         dto.setRol(usuario.getRol().getNombreRol());
 
-        reputacionDao.findById(usuario.getUsuarioId()).ifPresent(reputacion -> aplicarReputacion(dto, reputacion));
+        aplicarReputacion(dto, reputacionDe(usuario.getUsuarioId()));
 
         PreferenciaUsuario preferencias = preferenciaDao.findById(usuario.getUsuarioId())
                 .orElseGet(() -> PreferenciaUsuario.builder().radioCoberturaGeografica(new java.math.BigDecimal("1000.00"))
@@ -168,14 +167,18 @@ public class PerfilServiceImpl implements PerfilService {
         dto.setNombre(vecino.getNombres() + " " + vecino.getApellidos());
         dto.setSectorResidencia(vecino.getSectorResidencia());
         dto.setFotoAvatarUrl(vecino.getFotoAvatarUrl());
-        reputacionDao.findById(vecino.getUsuarioId()).ifPresent(reputacion -> {
-            dto.setNivelReputacion(reputacion.getNivelReputacion());
-            dto.setCantReportesCreados(reputacion.getCantReportesCreados());
-            dto.setCantValidacionesEmitidas(reputacion.getCantValidacionesEmitidas());
-        });
+        Reputacion reputacionVecino = reputacionDe(vecino.getUsuarioId());
+        dto.setNivelReputacion(reputacionVecino.getNivelReputacion());
+        dto.setCantReportesCreados(reputacionVecino.getCantReportesCreados());
+        dto.setCantValidacionesEmitidas(reputacionVecino.getCantValidacionesEmitidas());
         dto.setSeguidores(seguidorDao.listarSeguidores(vecino.getUsuarioId()).size());
         dto.setSiguiendo(seguidorDao.listarSeguidos(vecino.getUsuarioId()).size());
         return dto;
+    }
+
+    private Reputacion reputacionDe(UUID usuarioId) {
+        return reputacionDao.findById(usuarioId)
+                .orElseGet(() -> Reputacion.builder().usuarioId(usuarioId).build());
     }
 
     private Usuario usuarioActivo(UUID usuarioId) {

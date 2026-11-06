@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -14,15 +14,45 @@ const DetalleIncidente = () => {
   const [lat, setLat] = useState(null);
   const [lng, setLng] = useState(null);
   const [mensaje, setMensaje] = useState('');
+  const [error, setError] = useState('');
+
+  const cargarIncidente = useCallback(async () => {
+    try {
+      const res = await api.get(`/incidentes/${id}`);
+      setIncidente(res.data);
+      setError('');
+    } catch (err) {
+      if (err.response?.status === 403) {
+        setError('Acceso denegado. No tienes permisos para ver este incidente.');
+      } else if (err.response?.status === 404) {
+        setError('El incidente ya no está disponible.');
+      } else {
+        setError('No se pudo cargar la alerta. Inténtalo nuevamente.');
+      }
+    }
+  }, [id]);
 
   useEffect(() => {
-    api.get(`/incidentes/${id}`).then((res) => setIncidente(res.data));
-    api.get('/public/catalogos/tipos-voto').then((res) => setTipoVotos(res.data));
+    const inicial = window.setTimeout(cargarIncidente, 0);
+    api.get('/public/catalogos/tipos-voto').then((res) => setTipoVotos(res.data)).catch(() => {});
     navigator.geolocation.getCurrentPosition((pos) => {
       setLat(pos.coords.latitude);
       setLng(pos.coords.longitude);
     });
-  }, [id]);
+    return () => window.clearTimeout(inicial);
+  }, [cargarIncidente]);
+
+  useEffect(() => {
+    const intervalo = window.setInterval(cargarIncidente, 20000);
+    const alVolver = () => {
+      if (document.visibilityState === 'visible') cargarIncidente();
+    };
+    document.addEventListener('visibilitychange', alVolver);
+    return () => {
+      window.clearInterval(intervalo);
+      document.removeEventListener('visibilitychange', alVolver);
+    };
+  }, [cargarIncidente]);
 
   const votar = async () => {
     setMensaje('');
@@ -36,14 +66,36 @@ const DetalleIncidente = () => {
         fotoEvidenciaUrl: null,
       });
       setMensaje('Voto emitido correctamente');
-      api.get(`/incidentes/${id}`).then((res) => setIncidente(res.data));
+      cargarIncidente();
     } catch (err) {
       setMensaje(err.response?.data?.mensaje || 'Error al votar');
     }
   };
 
+  if (error) {
+    return (
+      <div className="grid min-h-full place-items-center bg-[#f5f7fa] px-4 py-10">
+        <div className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-sm">
+          <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-red-50 text-red-600">
+            <Icon icon="material-symbols-light:lock-outline" width="32" height="32" aria-hidden="true" />
+          </span>
+          <h1 className="mt-3 text-lg font-extrabold text-slate-900">No se puede mostrar la alerta</h1>
+          <p className="mt-2 text-sm leading-6 text-slate-600">{error}</p>
+          <Link to="/feed" className="mt-5 inline-block rounded-xl bg-blue-700 px-4 py-2.5 text-sm font-bold text-white">Volver al feed</Link>
+        </div>
+      </div>
+    );
+  }
+
   if (!incidente) return <div className="mx-auto max-w-lg p-6 text-sm font-medium text-slate-500">Cargando alerta…</div>;
 
+  const normalizado = (incidente.estadoNombre || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
+  const resuelto = normalizado.includes('resuelt') || normalizado.includes('atendid');
+  const rechazado = normalizado.includes('rechaz') || normalizado.includes('descar') || normalizado.includes('falsa');
+  const cerrado = resuelto || rechazado;
   const confianza = Math.min(100, Math.max(0, Number(incidente.indiceConfianzaPorcentaje) || 0));
 
   return (
@@ -92,7 +144,12 @@ const DetalleIncidente = () => {
           <h2 className="font-extrabold text-slate-900">¿Qué ocurre ahora en la zona?</h2>
           <p className="mt-1 text-sm text-slate-600">Tu confirmación ayuda a mantener informada a la comunidad.</p>
 
-          {user ? (
+          {cerrado ? (
+            <div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800">
+              {resuelto ? 'Este incidente fue resuelto por la autoridad.' : 'Este incidente fue descartado por la autoridad.'}
+              {' '}Ya no admite nuevas validaciones.
+            </div>
+          ) : user ? (
             <div className="mt-4">
               <label htmlFor="tipo-voto" className="mb-2 block text-xs font-bold text-slate-700">Selecciona tu validación</label>
               <select id="tipo-voto" className="w-full rounded-lg border border-slate-300 bg-white p-3 text-sm" value={tipoVotoId} onChange={(e) => setTipoVotoId(e.target.value)}>
